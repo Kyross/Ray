@@ -1,0 +1,17 @@
+﻿  main.cpp
+d:\mes documents\visual studio 2017\tp_si\ray\raycasting\src\geometry\scene.h(219): warning C4244: 'argument' : conversion de 'double' en 'const float', perte possible de données
+  Génération de code en cours
+  Fin de la génération du code
+SOIL.lib(SOIL.obj) : warning LNK4099: PDB 'SOIL.pdb' n'a pu être trouvé avec 'SOIL.lib(SOIL.obj)' ou sur 'D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\RayCasting\project 2017\Release\SOIL.pdb' ; l'objet sera lié sans informations de débogage
+SOIL.lib(image_helper.obj) : warning LNK4099: PDB 'SOIL.pdb' n'a pu être trouvé avec 'SOIL.lib(image_helper.obj)' ou sur 'D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\RayCasting\project 2017\Release\SOIL.pdb' ; l'objet sera lié sans informations de débogage
+SOIL.lib(stb_image_aug.obj) : warning LNK4099: PDB 'SOIL.pdb' n'a pu être trouvé avec 'SOIL.lib(stb_image_aug.obj)' ou sur 'D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\RayCasting\project 2017\Release\SOIL.pdb' ; l'objet sera lié sans informations de débogage
+SOIL.lib(image_DXT.obj) : warning LNK4099: PDB 'SOIL.pdb' n'a pu être trouvé avec 'SOIL.lib(image_DXT.obj)' ou sur 'D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\RayCasting\project 2017\Release\SOIL.pdb' ; l'objet sera lié sans informations de débogage
+  RayCasting.vcxproj -> D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\RayCasting\project 2017\Release\RayCasting.exe
+  D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\lib2017\Release\freeglut.dll
+  D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\lib2017\Release\lib3ds-1_3.dll
+  D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\lib2017\Release\SDL2.dll
+  D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\lib2017\Release\tbb.dll
+  D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\lib2017\Release\tbbmalloc.dll
+  D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\lib2017\Release\tbbmalloc_proxy.dll
+  D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\lib2017\Release\tbb_preview.dll
+          7 fichier(s) copié(s).

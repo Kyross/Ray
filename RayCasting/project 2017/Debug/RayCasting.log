@@ -1,0 +1,21 @@
+﻿  main.cpp
+d:\mes documents\visual studio 2017\tp_si\ray\raycasting\src\geometry\scene.h(219): warning C4244: 'argument' : conversion de 'double' en 'const float', perte possible de données
+d:\mes documents\visual studio 2017\tp_si\ray\raycasting\src\geometry\bvh.h(268): warning C4715: 'Geometry::BVH::checkNode' : les chemins de contrôle ne retournent pas tous une valeur
+  SOIL.lib(SOIL.obj) : .netmodule ou module MSIL compilé avec /GL trouvé ; redémarrage de l'édition de liens avec /LTCG ; ajoutez /LTCG à la ligne de commande de l'édition de liens pour améliorer les performances de l'Éditeur de liens
+LINK : warning LNK4075: ' /INCREMENTAL' ignorÚ Ó cause de la spÚcification '/LTCG'
+LINK : warning LNK4098: conflit entre la bibliothÞque par dÚfaut 'MSVCRT' et les autres bibliothÞquesá; utilisez /NODEFAULTLIB:library
+  GÚnÚration de code en cours
+  Fin de la gÚnÚration du code
+SOIL.lib(SOIL.obj) : warning LNK4099: PDB 'SOIL.pdb' n'a pu Ûtre trouvÚ avec 'SOIL.lib(SOIL.obj)' ou sur 'D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\RayCasting\project 2017\Debug\SOIL.pdb'á; l'objet sera liÚ sans informations de dÚbogage
+SOIL.lib(image_helper.obj) : warning LNK4099: PDB 'SOIL.pdb' n'a pu Ûtre trouvÚ avec 'SOIL.lib(image_helper.obj)' ou sur 'D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\RayCasting\project 2017\Debug\SOIL.pdb'á; l'objet sera liÚ sans informations de dÚbogage
+SOIL.lib(stb_image_aug.obj) : warning LNK4099: PDB 'SOIL.pdb' n'a pu Ûtre trouvÚ avec 'SOIL.lib(stb_image_aug.obj)' ou sur 'D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\RayCasting\project 2017\Debug\SOIL.pdb'á; l'objet sera liÚ sans informations de dÚbogage
+SOIL.lib(image_DXT.obj) : warning LNK4099: PDB 'SOIL.pdb' n'a pu Ûtre trouvÚ avec 'SOIL.lib(image_DXT.obj)' ou sur 'D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\RayCasting\project 2017\Debug\SOIL.pdb'á; l'objet sera liÚ sans informations de dÚbogage
+  RayCasting.vcxproj -> D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\RayCasting\project 2017\Debug\RayCasting.exe
+  D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\lib2017\Debug\freeglutd.dll
+  D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\lib2017\Debug\lib3ds-1_3d.dll
+  D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\lib2017\Debug\SDL2.dll
+  D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\lib2017\Debug\tbbmalloc_debug.dll
+  D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\lib2017\Debug\tbbmalloc_proxy_debug.dll
+  D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\lib2017\Debug\tbb_debug.dll
+  D:\Mes Documents\Visual Studio 2017\TP_SI\Ray\lib2017\Debug\tbb_preview_debug.dll
+          7 fichier(s) copié(s).
