@@ -1,1 +1,4 @@
 *.opendb
+*.obj
+*.pdf
+*.log

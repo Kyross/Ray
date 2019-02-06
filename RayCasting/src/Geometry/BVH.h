@@ -34,7 +34,7 @@ namespace Geometry {
 			}
 
 			bool isLeaf() {
-				return m_filsDroit == nullptr && m_filsDroit == nullptr;
+				return m_filsDroit == nullptr && m_filsGauche == nullptr;
 			}
 
 		};
