@@ -2,3 +2,8 @@
 *.obj
 *.pdf
 *.log
+*.db
+*.pdb
+*.exe
+*.suo
+*.ipch
