@@ -673,8 +673,8 @@ int main(int argc, char ** argv)
 
 	// 1 - Initializes a window for rendering
 	//Visualizer::Visualizer visu(1000,1000) ;
-	//Visualizer::Visualizer visu(500, 500);
-	Visualizer::Visualizer visu(300,300) ;
+	Visualizer::Visualizer visu(500, 500);
+	//Visualizer::Visualizer visu(300,300) ;
 	
 	// 2 - Initializes the scene
 	Geometry::Scene scene(&visu) ;
@@ -688,13 +688,13 @@ int main(int argc, char ** argv)
 	//initDog(scene);
 	//initGarage(scene);
 	//initTemple(scene);
-	initRobot(scene);
+	//initRobot(scene);
 	//initGraveStone(scene);
 	//initBoat(scene);
 	//initSombrero(scene);
 	//initTibetHouse(scene);
 	//initTibetHouseInside(scene);
-	//initMedievalCity(scene);
+	initMedievalCity(scene);
 	// Shows stats
 	scene.printStats();
 
