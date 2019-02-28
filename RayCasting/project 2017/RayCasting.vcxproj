@@ -152,6 +152,8 @@
     <ClInclude Include="..\src\Visualizer\Visualizer.h" />
     <ClInclude Include="..\src\Visualizer\Visualizer_backup.h" />
     <ClInclude Include="..\src\Geometry\Camera.h" />
+    <ClInclude Include="..\src\Geometry\LightSource.h" />
+    <ClInclude Include="..\src\Geometry\RectangularLightSource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Geometry\Scene.cpp" />

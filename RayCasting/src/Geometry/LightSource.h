@@ -17,23 +17,41 @@ namespace Geometry
 		/// <summary> A random number generator. </summary>
 		mutable std::mt19937_64 randomGenerator;
 		::std::vector<double> surfaceSum;
-		::std::vector<Triangle> allTriangles;
+		//::std::vector<Triangle> allTriangles; //Faire vector de const Triangle * 
+		::std::vector<const Triangle * > allTriangles;
 		double currentSum;
+		Math::Vector3f m_position;
+		RGBColor m_color;
 
 	public:
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		LightSource()
-			: currentSum(0.0), Geometry()
+		LightSource(Math::Vector3f position)
+			: m_position(position),currentSum(0.0), Geometry()
 		{}
-
+		
 
 		/// <summary>
 		/// Genates a point light by sampling the kept triangles.
 		/// </summary>
 		/// <returns></returns>
-		virtual PointLight generate() const = 0 {}
+		virtual std::pair<PointLight, const Triangle * > generate() const = 0 {}
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \fn	const Math::Vector3 & PointLight::position() const
+		///
+		/// \brief	Gets the position of the light.
+		///
+		/// \author	F. Lamarche, Universit� de Rennes 1
+		/// \date	04/12/2013
+		///
+		/// \return	.
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		const Math::Vector3f & position() const
+		{
+			return m_position;
+		}
 
 		/// <summary>
 		/// Adds a triangle to the light sampler.
@@ -45,7 +63,7 @@ namespace Geometry
 			{
 				currentSum += triangle.surface()/**it->material()->getEmissive().grey()*/;
 				surfaceSum.push_back(currentSum);
-				allTriangles.push_back(triangle);
+				allTriangles.push_back(&triangle);
 			}
 		}
 
