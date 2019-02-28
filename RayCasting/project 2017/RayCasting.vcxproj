@@ -14,7 +14,7 @@
     <ProjectGuid>{6231377D-23E9-429B-BE2A-0697FD8FDB8C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>RayCasting</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -150,6 +150,8 @@
     <ClInclude Include="..\src\Visualizer\Visualizer.h" />
     <ClInclude Include="..\src\Visualizer\Visualizer_backup.h" />
     <ClInclude Include="..\src\Geometry\Camera.h" />
+    <ClInclude Include="..\src\Geometry\LightSource.h" />
+    <ClInclude Include="..\src\Geometry\RectangularLightSource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Geometry\Scene.cpp" />
