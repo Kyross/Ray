@@ -694,7 +694,7 @@ int main(int argc, char ** argv)
 	//initDiffuseSpecular(scene) ;
 	//initSpecular(scene) ;
 	//initGuitar(scene);
-	//initDog(scene);
+	initDog(scene);
 	//initGarage(scene);
 	//initTemple(scene);
 	//initRobot(scene);
