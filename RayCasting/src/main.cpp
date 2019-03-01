@@ -685,7 +685,7 @@ int main(int argc, char ** argv)
 	//initDiffuseSpecular(scene) ;
 	//initSpecular(scene) ;
 	//initGuitar(scene);
-	//initDog(scene);
+	initDog(scene);
 	//initGarage(scene);
 	//initTemple(scene);
 	//initRobot(scene);
@@ -694,7 +694,7 @@ int main(int argc, char ** argv)
 	//initSombrero(scene);
 	//initTibetHouse(scene);
 	//initTibetHouseInside(scene);
-	initMedievalCity(scene);
+	//initMedievalCity(scene);
 	// Shows stats
 	scene.printStats();
 

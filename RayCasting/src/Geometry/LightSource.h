@@ -1,5 +1,6 @@
 #ifndef _GEOMETRY_LIGHTSOURCE_H
 #include <Geometry/Material.h>
+#include <Geometry/PointLight.h>
 
 namespace Geometry
 {
@@ -18,7 +19,7 @@ namespace Geometry
 		{}
 
 
-		virtual void samplePointLight() = 0;
+		virtual PointLight & samplePointLight() = 0;
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	const RGBColor & PointLight::color() const
