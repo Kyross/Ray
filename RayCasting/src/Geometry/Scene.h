@@ -16,7 +16,7 @@
 #include <random>
 #include <Geometry/LightSampler.h>
 #include <Geometry/BVH.h>
-
+#include <Geometry/Sampler.h>
 namespace Geometry
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -215,18 +215,30 @@ namespace Geometry
 				RGBColor ie=cray.intersectionFound().triangle()->material()->getEmissive();
 				RGBColor ia = cray.intersectionFound().triangle()->material()->getAmbient();
 
-				//On ne prend pas en compte ia dans les calculs car elle fausse le résultat pour (au moins) sombrero et robot
-				I = ie + phongDirect(cray) + reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
-				//texture
-				RGBColor stexture = cray.intersectionFound().triangle()->sampleTexture(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue());
-				I = I*stexture;
+				//Sample light 
+				if (m_lightSampler.hasLights()) {
+					PointLight light_sampled = m_lightSampler.generate();
+					//On ne prend pas en compte ia dans les calculs car elle fausse le résultat pour (au moins) sombrero et robot
+					I = ie + phongDirect(cray,light_sampled) + reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
+					//texture
+					RGBColor stexture = cray.intersectionFound().triangle()->sampleTexture(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue());
+					I = I * stexture;
+				}
 			}
 			return I;
 		}
 
-		RGBColor phongDirect(CastedRay const &cray) {
+		RGBColor phongDirect(CastedRay const &cray,PointLight light_sampled) {
 			RGBColor result(0.0, 0.0, 0.0);
 			
+			//Global illumination
+			if (!phongShadow(cray, light_sampled)) {
+				//pas dans l'ombre donc on calcule
+				result = result + (phongDiffuse(cray, light_sampled) + phongSpecular(cray, light_sampled))*light_sampled.color();
+			}
+			
+			/*
+			//Raytracing
 			//On verifie pour chaque lumiere si celle si eclaire notre point d'intersection
 			for (const PointLight &light : m_lights) {
 				if (!phongShadow(cray, light)) {
@@ -234,6 +246,7 @@ namespace Geometry
 					result = result +(phongDiffuse(cray, light)+phongSpecular(cray,light))*light.color();
 				}
 			}
+			*/
 			return result;
 		}
 
