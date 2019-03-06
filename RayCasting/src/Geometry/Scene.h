@@ -27,7 +27,7 @@ namespace Geometry
 	/// 		allowing to add geometry, lights and a camera are provided. Scene rendering is achieved by
 	/// 		calling the Scene::compute method.
 	///
-	/// \author	F. Lamarche, Université de Rennes 1
+	/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 	/// \date	03/12/2013
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	class Scene
@@ -68,7 +68,7 @@ namespace Geometry
 		///
 		/// \brief	Constructor.
 		///
-		/// \author	F. Lamarche, Université de Rennes 1
+		/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 		/// \date	03/12/2013
 		///
 		/// \param [in,out]	visu	If non-null, the visu.
@@ -132,7 +132,7 @@ namespace Geometry
 		///
 		/// \brief	Adds a geometry to the scene.
 		///
-		/// \author	F. Lamarche, Université de Rennes 1
+		/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 		/// \date	03/12/2013
 		///
 		/// \param	geometry The geometry to add.
@@ -158,7 +158,7 @@ namespace Geometry
 		///
 		/// \brief	Adds a poitn light in the scene.
 		///
-		/// \author	F. Lamarche, Université de Rennes 1
+		/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 		/// \date	04/12/2013
 		///
 		/// \param [in,out]	light	If non-null, the light to add.
@@ -179,7 +179,7 @@ namespace Geometry
 		///
 		/// \brief	Sets the camera.
 		///
-		/// \author	F. Lamarche, Université de Rennes 1
+		/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 		/// \date	04/12/2013
 		///
 		/// \param	cam	The camera.
@@ -194,7 +194,7 @@ namespace Geometry
 		///
 		/// \brief	Sends a ray in the scene and returns the computed color
 		///
-		/// \author	F. Lamarche, Université de Rennes 1
+		/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 		/// \date	04/12/2013
 		///
 		/// \param	ray			The ray.
@@ -224,16 +224,20 @@ namespace Geometry
 				RGBColor ie=cray.intersectionFound().triangle()->material()->getEmissive();
 				RGBColor ia = cray.intersectionFound().triangle()->material()->getAmbient();
 
-				//On ne prend pas en compte ia dans les calculs car elle fausse le résultat pour (au moins) sombrero et robot
-				I = ie + phongDirect(cray) + reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
-				//texture
-				RGBColor stexture = cray.intersectionFound().triangle()->sampleTexture(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue());
-				I = I*stexture;
+				//Sample light 
+				if (m_lightSampler.hasLights()) {
+					PointLight light_sampled = m_lightSampler.generate();
+					//On ne prend pas en compte ia dans les calculs car elle fausse le rï¿½sultat pour (au moins) sombrero et robot
+					I = ie + phongDirect(cray,light_sampled) + reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
+					//texture
+					RGBColor stexture = cray.intersectionFound().triangle()->sampleTexture(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue());
+					I = I * stexture;
+				}
 			}
 			return I;
 		}
 
-		RGBColor phongDirect(CastedRay const &cray) {
+		RGBColor phongDirect(CastedRay const &cray,PointLight light_sampled) {
 			RGBColor result(0.0, 0.0, 0.0);
 			
 			if (m_GI_surface) {
@@ -268,7 +272,7 @@ namespace Geometry
 			//normal du triangle intersecte
 			Math::Vector3f N = cray.intersectionFound().triangle()->sampleNormal(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue(), cray.source());
 			//Math::Vector3f N = cray.intersectionFound().triangle()->normal();
-			//Si le produit scalaire entre la normale du triangle et la direction du regard est negatif, on prend l'opposé de la normale du triangle
+			//Si le produit scalaire entre la normale du triangle et la direction du regard est negatif, on prend l'opposï¿½ de la normale du triangle
 			if (N*cray.direction() < 0) N = -N;
 
 			//direction de la l'intersection vers la light
@@ -363,7 +367,7 @@ namespace Geometry
 		///
 		/// \brief	Computes a rendering of the current scene, viewed by the camera.
 		/// 		
-		/// \author	F. Lamarche, Université de Rennes 1
+		/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 		/// \date	04/12/2013
 		///
 		/// \param	maxDepth	The maximum recursive depth.

@@ -21,6 +21,8 @@
 #include <omp.h>
 #include <Geometry/BVH.h>
 #include <Geometry/LightSurface.h>
+#include <Geometry/SurfaceLight.h>
+#include <Geometry/LightSampler.h>
 
 /// <summary>
 /// The directory of the 3D objetcs
@@ -34,7 +36,7 @@ using Geometry::RGBColor ;
 ///
 /// \brief	Adds a ground to the scene.
 ///
-/// \author	F. Lamarche, Université de Rennes 1
+/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 /// \date	03/12/2013
 ///
 /// \param [in,out]	scene	The scene.
@@ -67,7 +69,7 @@ void createGround(Geometry::Scene & scene)
 ///
 /// \brief	Adds a sirface area light to the scene
 ///
-/// \author	F. Lamarche, Université de Rennes 1
+/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 /// \date	03/12/2013
 ///
 /// \param [in,out]	scene	The scene.
@@ -94,7 +96,7 @@ void createSurfaceLigth(Geometry::Scene & scene, double value)
 /// \brief	Adds a Cornell Box with diffuse material on each walls to the scene. This Cornel box
 /// 		contains two cubes.
 ///
-/// \author	F. Lamarche, Université de Rennes 1
+/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 /// \date	03/12/2013
 ///
 /// \param [in,out]	scene	The scene.
@@ -132,6 +134,11 @@ void initDiffuse(Geometry::Scene & scene)
 		Geometry::PointLight pointLight2(Math::makeVector(4.f, 0.f, 0.f), RGBColor(0.5f, 0.5f, 0.5f));
 		scene.add(pointLight2);
 	}
+
+	
+	Geometry::SurfaceLight s(Math::makeVector(0, 0, 4),2);
+	scene.add(s);
+
 	{
 		Geometry::Camera camera(Math::makeVector(-4.0f, 0.0f, 0.0f), Math::makeVector(0.0f, 0.0f, 0.0f), 0.3f, 1.0f, 1.0f);
 		scene.setCamera(camera);
@@ -149,7 +156,7 @@ void initDiffuse(Geometry::Scene & scene)
 /// \brief	Adds a Cornel box in the provided scene. Walls are specular and the box contains two 
 /// 		cubes.
 ///
-/// \author	F. Lamarche, Université de Rennes 1
+/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 /// \date	03/12/2013
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void initSpecular(Geometry::Scene & scene)
@@ -195,7 +202,7 @@ void initSpecular(Geometry::Scene & scene)
 /// \brief	Adds a Cornel box in the provided scene. The cornel box as diffuse and specular walls and 
 /// 		contains two boxes.
 ///
-/// \author	F. Lamarche, Université de Rennes 1
+/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 /// \date	03/12/2013
 ///
 /// \param [in,out]	scene	The scene.
@@ -264,7 +271,7 @@ void initGarage(Geometry::Scene & scene)
 		Geometry::Camera camera(Math::makeVector(750.0f, -1500.f, 1000.f)*0.85f, Math::makeVector(200.0f, 0.0f, 0.0f), 0.3f, 1.0f, 1.0f);
 		scene.setCamera(camera);
 	}
-	createGround(scene);
+	createGround(scene);	
 }
 
 /// <summary>
@@ -641,7 +648,7 @@ void initSombrero(Geometry::Scene & scene)
 ///
 /// \brief	Waits until a key is pressed.
 /// 		
-/// \author	F. Lamarche, Université de Rennes 1
+/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 /// \date	03/12/2013
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void waitKeyPressed()
@@ -668,7 +675,7 @@ void waitKeyPressed()
 ///
 /// \brief	Main entry-point for this application.
 ///
-/// \author	F. Lamarche, Université de Rennes 1
+/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 /// \date	03/12/2013
 ///
 /// \param	argc	Number of command-line arguments.
@@ -694,7 +701,7 @@ int main(int argc, char ** argv)
 	//initDiffuseSpecular(scene) ;
 	//initSpecular(scene) ;
 	//initGuitar(scene);
-	initDog(scene);
+	//initDog(scene);
 	//initGarage(scene);
 	//initTemple(scene);
 	//initRobot(scene);
