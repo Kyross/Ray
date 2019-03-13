@@ -306,7 +306,7 @@ namespace Geometry
 			return i_specular;
 		}
 
-		RGBColor reflection(CastedRay const & cray, int const &depth, int const &maxDepth, int const & diffuseSamples, int const &specularSamples, float const &krefl)
+		RGBColor reflection(CastedRay const & cray, int const &depth, int const &maxDepth, int const & diffuseSamples, int const &specularSamples, double const &krefl)
 		{
 			//Eclairage indirect
 			//normal du triangle intersecte
@@ -367,12 +367,13 @@ namespace Geometry
 		void compute(int maxDepth, int subPixelDivision = 1, int passPerPixel = 1)
 		{
 			buildBVH();
+			/*
 			// We prepare the light sampler (the sampler only stores triangles with a non null emissive component).
 			for (auto it = m_geometries.begin(), end = m_geometries.end(); it != end; ++it)
 			{
 				//emissive a voir
 				//m_lightSampler.add(it->second);
-			}
+			}*/
 
 			// Step on x and y for subpixel sampling
 			double step = 1.0f/subPixelDivision ;
