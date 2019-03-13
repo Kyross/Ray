@@ -21,8 +21,8 @@
 #include <omp.h>
 #include <Geometry/BVH.h>
 #include <Geometry/LightSurface.h>
-#include <Geometry/SurfaceLight.h>
 #include <Geometry/LightSampler.h>
+#include <Geometry/LightSource.h>
 
 /// <summary>
 /// The directory of the 3D objetcs
@@ -128,17 +128,18 @@ void initDiffuse(Geometry::Scene & scene)
 	// 2.2 Adds point lights in the scene 
 	{
 		Geometry::PointLight pointLight(Math::makeVector(0.0f, 0.f, 2.0f), RGBColor(0.5f, 0.5f, 0.5f));
-		scene.add(pointLight);
+		//scene.add(pointLight);
 	}
 	{
 		Geometry::PointLight pointLight2(Math::makeVector(4.f, 0.f, 0.f), RGBColor(0.5f, 0.5f, 0.5f));
-		scene.add(pointLight2);
+		//scene.add(pointLight2);
 	}
-
-	
-	Geometry::SurfaceLight s(Math::makeVector(0, 0, 4),2);
-	scene.add(s);
-
+	{
+		//LightSurface
+		Geometry::LightSource *surface1=new Geometry::LightSurface(Math::makeVector(0, 0, 4), 2);
+		scene.add(surface1);
+		//scene.add(new Geometry::LightSurface(Math::makeVector(0, 0, 4), 2));
+	}
 	{
 		Geometry::Camera camera(Math::makeVector(-4.0f, 0.0f, 0.0f), Math::makeVector(0.0f, 0.0f, 0.0f), 0.3f, 1.0f, 1.0f);
 		scene.setCamera(camera);
@@ -183,11 +184,11 @@ void initSpecular(Geometry::Scene & scene)
 	// 2.2 Adds point lights in the scene 
 	{
 		Geometry::PointLight pointLight(Math::makeVector(0.0f, 0.f, 2.0f), RGBColor(0.5f, 0.5f, 0.5f)*5);
-		scene.add(pointLight);
+	//	scene.add(pointLight);
 	}
 	{
 		Geometry::PointLight pointLight2(Math::makeVector(4.f, 0.f, 0.f), RGBColor(0.5f, 0.5f, 0.5f)*5);
-		scene.add(pointLight2);
+	//	scene.add(pointLight2);
 	}
 	// Sets the camera
 	{
@@ -234,11 +235,11 @@ void initDiffuseSpecular(Geometry::Scene & scene)
 	// 2.2 Adds point lights in the scene 
 	{
 		Geometry::PointLight pointLight(Math::makeVector(0.0f, 0.f, 2.0f), RGBColor(0.5f, 0.5f, 0.5f));
-		scene.add(pointLight);
+		//scene.add(pointLight);
 	}
 	{
 		Geometry::PointLight pointLight2(Math::makeVector(4.f, 0.f, 0.f), RGBColor(0.5f, 0.5f, 0.5f));
-		scene.add(pointLight2);
+		//scene.add(pointLight2);
 	}
 	{
 		Geometry::Camera camera(Math::makeVector(-4.0f, 0.0f, 0.0f), Math::makeVector(0.0f, 0.0f, 0.0f), 0.3f, 1.0f, 1.0f);
@@ -263,10 +264,10 @@ void initGarage(Geometry::Scene & scene)
 	Geometry::BoundingBox sb = scene.getBoundingBox();
 	Math::Vector3f position = sb.max();
 	Geometry::PointLight light1(position, RGBColor(1.0, 1.0, 1.0)*1000);
-	scene.add(light1);
+	//scene.add(light1);
 	position[1] = -position[1];
 	Geometry::PointLight light2(position, RGBColor(1.0, 1.0, 1.0)*1000);
-	scene.add(light2);
+	//scene.add(light2);
 	{
 		Geometry::Camera camera(Math::makeVector(750.0f, -1500.f, 1000.f)*0.85f, Math::makeVector(200.0f, 0.0f, 0.0f), 0.3f, 1.0f, 1.0f);
 		scene.setCamera(camera);
@@ -290,10 +291,10 @@ void initGuitar(Geometry::Scene & scene)
 	Geometry::BoundingBox sb = scene.getBoundingBox();
 	Math::Vector3f position = sb.max();
 	Geometry::PointLight light1(position + Math::makeVector(0.f, 0.f, 70.f/*100.f*/), RGBColor(1.0, 1.0, 1.0)*500);
-	scene.add(light1);
+	//scene.add(light1);
 	position[1] = -position[1];
 	Geometry::PointLight light2(position+Math::makeVector(0.f,0.f,200.f), RGBColor(1.0, 1.0, 1.0)*500);
-	scene.add(light2);
+	//scene.add(light2);
 	{
 		Geometry::Camera camera(Math::makeVector(-500., -1000., 1000.)*1.05, Math::makeVector(500.f, 0.0f, 0.0f), 0.6f, 1.0f, 1.0f);
 		camera.translateLocal(Math::makeVector(100.0f, -100.f, -200.f));
@@ -319,10 +320,10 @@ void initDog(Geometry::Scene & scene)
 	Geometry::BoundingBox sb = scene.getBoundingBox();
 	Math::Vector3f position = sb.max();
 	Geometry::PointLight light1(position, RGBColor(1.0, 1.0, 1.0)*2);
-	scene.add(light1);
+	//scene.add(light1);
 	position[1] = -position[1];
 	Geometry::PointLight light2(position, RGBColor(1.0, 1.0, 1.0)*2);
-	scene.add(light2);
+	//scene.add(light2);
 	{
 		Geometry::Camera camera(Math::makeVector(10.f, 10.f, 6.f)*0.5, Math::makeVector(0.f, 0.0f, 2.5f), .7f, 1.0f, 1.0f);
 		camera.translateLocal(Math::makeVector(-0.4f, 0.f, 0.9f));
@@ -352,11 +353,11 @@ void initTemple(Geometry::Scene & scene)
 	Math::Vector3f position = sb.max();
 	//Geometry::PointLight light1(position, RGBColor(1.0, 1.0, 1.0)*60.0);
 	Geometry::PointLight light1(position, RGBColor(1.0, 1.0, 1.0)*600.0);
-	scene.add(light1);
+	//scene.add(light1);
 	position[1] = -position[1];
 	//Geometry::PointLight light2(position, RGBColor(1.0, 1.0, 1.0)*30);
 	Geometry::PointLight light2(position, RGBColor(1.0, 1.0, 1.0) * 300);
-	scene.add(light2);
+	//scene.add(light2);
 	{
 		Geometry::Camera camera(Math::makeVector(20.0f, -100.0f, 15.0f), Math::makeVector(-20.f, 0.f, -40.f), 0.3f, 1.0f, 1.0f);
 		camera.translateLocal(Math::makeVector(40.f, 0.f, 0.f));
@@ -387,10 +388,10 @@ void initRobot(Geometry::Scene & scene)
 	Geometry::BoundingBox sb = scene.getBoundingBox();
 	Math::Vector3f position = sb.max();
 	Geometry::PointLight light1(position, RGBColor(1.0, 1.0, 1.0)*60.0);
-	scene.add(light1);
+	//scene.add(light1);
 	position[1] = -position[1];
 	Geometry::PointLight light2(position, RGBColor(1.0, 1.0, 1.0) * 30);
-	scene.add(light2);
+	//scene.add(light2);
 	{
 		Geometry::Camera camera(Math::makeVector(100.0f, -50.0f, 0.0f), Math::makeVector(0.f, 0.f, -20.f), 0.3f, 1.0f, 1.0f);
 		camera.translateLocal(Math::makeVector(0.f, 40.f, 50.f));
@@ -426,10 +427,10 @@ void initGraveStone(Geometry::Scene & scene)
 	Geometry::BoundingBox sb = scene.getBoundingBox();
 	Math::Vector3f position = sb.max();
 	Geometry::PointLight light1(position, RGBColor(1.0, 1.0, 1.0)*1500*0.2);
-	scene.add(light1);
+	//scene.add(light1);
 	position[1] = -position[1];
 	Geometry::PointLight light2(position, RGBColor(1.0, 1.0, 1.0) * 1000*0.4);
-	scene.add(light2);
+	//scene.add(light2);
 	{
 		Geometry::Camera camera(Math::makeVector(0.f, -300.0f, 200.0f), Math::makeVector(0.f, 0.f, 60.f), 0.3f, 1.0f, 1.0f);
 		camera.translateLocal(Math::makeVector(0.f, 80.f, 120.f));
@@ -465,10 +466,10 @@ void initBoat(Geometry::Scene & scene)
 	Geometry::BoundingBox sb = scene.getBoundingBox();
 	Math::Vector3f position = sb.max();
 	Geometry::PointLight light1(position, RGBColor(1.0, 1.0, 1.0)*6000.0);
-	scene.add(light1);
+	//scene.add(light1);
 	position[1] = -position[1];
 	Geometry::PointLight light2(position, RGBColor(1.0, 1.0, 1.0) * 20000);
-	scene.add(light2);
+	//scene.add(light2);
 	{
 		Geometry::Camera camera(Math::makeVector(5000.f, 5000.f, 200.0f), Math::makeVector(0.f, 0.f, 60.f), 0.3f, 1.0f, 1.0f);
 		camera.translateLocal(Math::makeVector(2000.f, 3000.f, 700.f));
@@ -592,10 +593,10 @@ void initMedievalCity(Geometry::Scene & scene)
 	Geometry::BoundingBox sb = scene.getBoundingBox();
 	Math::Vector3f position = sb.max();
 	Geometry::PointLight light1(position+Math::makeVector(0.0,0.0,150.0), RGBColor(1.0, 0.6, 0.3)*800.0);
-	scene.add(light1);
+	//scene.add(light1);
 	position[1] = -position[1];
 	Geometry::PointLight light2(position + Math::makeVector(0.0, 0.0, 1000.0), RGBColor(1.0, 1.0, 1.0) * 400);
-	scene.add(light2);
+	//scene.add(light2);
 	//Geometry::PointLight light3(Math::makeVector(5.f, 35.f, 5.f), RGBColor(1.0, 1.0, 1.0) * 50);
 	//scene.add(light3);
 	{
@@ -631,10 +632,10 @@ void initSombrero(Geometry::Scene & scene)
 	Geometry::BoundingBox sb = scene.getBoundingBox();
 	Math::Vector3f position = sb.max();
 	Geometry::PointLight light1(position, RGBColor(1.0, 1.0, 1.0)*50.0);
-	scene.add(light1);
+	//scene.add(light1);
 	position[1] = -position[1];
 	Geometry::PointLight light2(position, RGBColor(1.0, 1.0, 1.0) * 50);
-	scene.add(light2);
+	//scene.add(light2);
 	{
 		Geometry::Camera camera(Math::makeVector(300.f, 0.f, 100.0f), Math::makeVector(0.f, 0.f, 0.f), 0.3f, 1.0f, 1.0f);
 		//camera.translateLocal(Math::makeVector(2000.f, 3000.f, 700.f));

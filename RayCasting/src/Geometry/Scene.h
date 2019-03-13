@@ -39,7 +39,7 @@ namespace Geometry
 		::std::deque<::std::pair<BoundingBox, Geometry> > m_geometries ;
 		//Geometry m_geometry ;
 		/// \brief	The lights.
-		std::vector<PointLight> m_lights ;
+		//std::vector<LightSource*> m_lights ;
 		/// \brief	The camera.
 		Camera m_camera ;
 		/// \brief The scene bounding box
@@ -55,7 +55,8 @@ namespace Geometry
 		/// <summary>
 		/// The light sampler associated with the scene
 		/// </summary>
-		LightSampler m_lightSampler;
+		//LightSampler m_lightSampler;
+		::std::vector<LightSource*> m_lightSampler;
 		//La structure d'optimisation qui va permettre d'optimiser le calcul d'intersections
 		BVH *m_bvh;
 		bool m_GI_surface = true;
@@ -154,26 +155,20 @@ namespace Geometry
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// \fn	void Scene::add(PointLight * light)
+		/// \fn	void Scene::add(LightSource * light)
 		///
-		/// \brief	Adds a poitn light in the scene.
+		/// \brief	Adds a light source in the scene.
 		///
 		/// \author	F. Lamarche, Universit� de Rennes 1
 		/// \date	04/12/2013
 		///
 		/// \param [in,out]	light	If non-null, the light to add.
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		void add(const PointLight & light)
+		void add(LightSource *light)
 		{
-			m_lights.push_back(light) ;
-		}
-
-		void add(LightSource * light)
-		{
-			m_lightSource.push_back(light);
+			m_lightSampler.push_back(light);
 			add(*light);
 		}
-
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	void Scene::setCamera(Camera const & cam)
 		///
@@ -224,20 +219,16 @@ namespace Geometry
 				RGBColor ie=cray.intersectionFound().triangle()->material()->getEmissive();
 				RGBColor ia = cray.intersectionFound().triangle()->material()->getAmbient();
 
-				//Sample light 
-				if (m_lightSampler.hasLights()) {
-					PointLight light_sampled = m_lightSampler.generate();
-					//On ne prend pas en compte ia dans les calculs car elle fausse le r�sultat pour (au moins) sombrero et robot
-					I = ie + phongDirect(cray,light_sampled) + reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
-					//texture
-					RGBColor stexture = cray.intersectionFound().triangle()->sampleTexture(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue());
-					I = I * stexture;
-				}
+				//On ne prend pas en compte ia dans les calculs car elle fausse le r�sultat pour (au moins) sombrero et robot
+				I = ie + phongDirect(cray) + reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
+				//texture
+				RGBColor stexture = cray.intersectionFound().triangle()->sampleTexture(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue());
+				I = I * stexture;
 			}
 			return I;
 		}
 
-		RGBColor phongDirect(CastedRay const &cray,PointLight light_sampled) {
+		RGBColor phongDirect(CastedRay const &cray) {
 			RGBColor result(0.0, 0.0, 0.0);
 			
 			if (m_GI_surface) {
@@ -379,7 +370,8 @@ namespace Geometry
 			// We prepare the light sampler (the sampler only stores triangles with a non null emissive component).
 			for (auto it = m_geometries.begin(), end = m_geometries.end(); it != end; ++it)
 			{
-				m_lightSampler.add(it->second);
+				//emissive a voir
+				//m_lightSampler.add(it->second);
 			}
 
 			// Step on x and y for subpixel sampling
