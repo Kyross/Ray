@@ -81,9 +81,6 @@
     <ClInclude Include="..\src\Geometry\RGBColor.h">
       <Filter>src\Geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Geometry\Scene.h">
-      <Filter>src\Geometry</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Geometry\Square.h">
       <Filter>src\Geometry</Filter>
     </ClInclude>
@@ -162,10 +159,14 @@
     <ClInclude Include="..\src\Geometry\BVH.h">
       <Filter>src\Geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Geometry\RectangularLightSource.h">
+    <ClInclude Include="..\src\Geometry\Scene.h">
       <Filter>src\Geometry</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Geometry\Sampler.h" />
     <ClInclude Include="..\src\Geometry\LightSource.h">
+      <Filter>src\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Geometry\LightSurface.h">
       <Filter>src\Geometry</Filter>
     </ClInclude>
   </ItemGroup>

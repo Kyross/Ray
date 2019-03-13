@@ -118,7 +118,7 @@ void initDiffuse(Geometry::Scene & scene)
 	tmp.translate(Math::makeVector(1.5,-1.5,0.0)) ;
 	scene.add(tmp) ;
 	
-	Geometry::Cube tmp2(cubeMat2) ;
+	Geometry::Cube tmp2(cubeMat1) ;
 	tmp2.translate(Math::makeVector(2,1,-4)) ;
 	scene.add(tmp2) ;
 
