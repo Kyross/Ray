@@ -211,7 +211,7 @@ namespace Geometry
 			}
 			
 			//verification intersection
-			optim(cray,"BVH");
+			optim(cray,"");
 
 
 			//Si intersection calcule selon le modele sinon background_color (noir) par defaut
@@ -228,7 +228,7 @@ namespace Geometry
 			return I;
 		}
 
-		RGBColor phongDirect(CastedRay const &cray) {
+		RGBColor phongDirect(CastedRay const &cray, PointLight generated_light, const Triangle * toIgnore) {
 			RGBColor result(0.0, 0.0, 0.0);
 			
 			if (m_GI_surface) {
@@ -276,7 +276,8 @@ namespace Geometry
 			return i_diffuse;
 		}
 
-		bool phongShadow(CastedRay const &cray, PointLight const &light) {
+		bool phongShadow(CastedRay const &cray, PointLight const &light, const Triangle * toIgnore) {
+			//retourne true si dans l'ombre
 			bool shadow = false;
 			CastedRay cshadow(light.position(), cray.intersectionFound().intersection() - light.position());
 
@@ -319,10 +320,10 @@ namespace Geometry
 			return cray.intersectionFound().triangle()->material()->getSpecular()*sendRay(creflection, depth + 1, maxDepth, diffuseSamples, specularSamples)*krefl;
 		}
 
-		void optim(CastedRay &cray, char* s="") {
+		void optim(CastedRay &cray, char* s="", const Triangle * toIgnore = nullptr) {
 			if (s=="BVH") {
 				//BVH
-				m_bvh->path(cray);
+				m_bvh->path(cray, toIgnore);
 			}
 			else {
 				optimTemp(cray);

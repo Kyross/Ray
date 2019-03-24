@@ -18,7 +18,8 @@ namespace Geometry
 		/// <summary> A random number generator. </summary>
 		mutable std::mt19937_64 randomGenerator;
 		::std::vector<double> surfaceSum;
-		::std::vector<Triangle> allTriangles;
+		//::std::vector<Triangle> allTriangles; //Faire vector de const Triangle * 
+		::std::vector<const Triangle * > allTriangles;
 		double currentSum ;
 
 	public:
@@ -39,7 +40,7 @@ namespace Geometry
 			{
 				currentSum += triangle.surface()/**it->material()->getEmissive().grey()*/;
 				surfaceSum.push_back(currentSum);
-				allTriangles.push_back(triangle);
+				allTriangles.push_back(&triangle);
 			}
 		}
 
@@ -69,17 +70,21 @@ namespace Geometry
 		/// Genates a point light by sampling the kept triangles.
 		/// </summary>
 		/// <returns></returns>
-		PointLight generate() const
+		std::pair<PointLight, const Triangle * > generate() const
 		{
 			double random = double(randomGenerator()) / double(randomGenerator.max());
 			random = random * currentSum;
 			auto found = std::lower_bound(surfaceSum.begin(), surfaceSum.end(), random);
 			size_t index = found - surfaceSum.begin();
-			Math::Vector3f barycentric = allTriangles[index].randomBarycentric();
-			Math::Vector3f point = allTriangles[index].pointFromBraycentric(barycentric);
-			RGBColor color = allTriangles[index].sampleTexture(barycentric);
-			
-			return PointLight(point, allTriangles[index].material()->getEmissive()*color);
+			Math::Vector3f barycentric = allTriangles[index]->randomBarycentric();
+			Math::Vector3f point = allTriangles[index]->pointFromBraycentric(barycentric);
+			RGBColor color = allTriangles[index]->sampleTexture(barycentric);
+
+			const Triangle * toIgnore = allTriangles[index];
+			PointLight light(point, allTriangles[index]->material()->getEmissive()*color);
+
+			std::pair<PointLight, const Triangle * > res(light, toIgnore);
+			return res;
 		}
 
 		/// <summary>

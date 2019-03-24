@@ -212,10 +212,10 @@ void initDiffuseSpecular(Geometry::Scene & scene)
 {
 	Geometry::Material * material = new Geometry::Material(RGBColor(), RGBColor(0,0,0.0), RGBColor(0.7f,0.7f,0.7f), 100, RGBColor()) ;
 	Geometry::Material * material2 = new Geometry::Material(RGBColor(), RGBColor(1,1,1.0f), RGBColor(0,0,0), 1000, RGBColor()) ;
-	Geometry::Material * cubeMat = new Geometry::Material(RGBColor(), RGBColor(1.0f, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
-	Geometry::Material * cubeMat2 = new Geometry::Material(RGBColor(), RGBColor(1.0f, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
-	//Geometry::Material * cubeMat = new Geometry::Material(RGBColor(), RGBColor(0.0f,0.0,0.0), RGBColor(0.0,0.0,0.0), 20.0f, RGBColor(10.0,0,0)) ;
-	//Geometry::Material * cubeMat2 = new Geometry::Material(RGBColor(), RGBColor(0.0f,0.0,0.0), RGBColor(0.0,0.0,0.0), 20.0f, RGBColor(0.0,10,0)) ;
+	//Geometry::Material * cubeMat = new Geometry::Material(RGBColor(), RGBColor(1.0f, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
+	//Geometry::Material * cubeMat2 = new Geometry::Material(RGBColor(), RGBColor(1.0f, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
+	Geometry::Material * cubeMat = new Geometry::Material(RGBColor(), RGBColor(0.0f,0.0,0.0), RGBColor(0.0,0.0,0.0), 20.0f, RGBColor(10.0,0,0)) ;
+	Geometry::Material * cubeMat2 = new Geometry::Material(RGBColor(), RGBColor(0.0f,0.0,0.0), RGBColor(0.0,0.0,0.0), 20.0f, RGBColor(0.0,10,0)) ;
 	Geometry::Cornel geo(material2, material2, material, material, material, material) ; //new Geometry::Cube(material2) ;////new Cone(4, material) ; //new Geometry::Cylinder(5, 1, 1, material) ;////////new Geometry::Cube(material) ;////; //new Geometry::Cube(material) ; //new Geometry::Cylinder(100, 2, 1, material) ; //
 
 	geo.scaleX(10) ;
@@ -476,6 +476,7 @@ void initBoat(Geometry::Scene & scene)
 		scene.setCamera(camera);
 	}
 	createGround(scene);
+	createSurfaceLigth(scene, 4000);
 }
 
 /// <summary>
@@ -716,10 +717,10 @@ int main(int argc, char ** argv)
 	scene.printStats();
 
 	// 3 - Computes the scene
-	unsigned int passPerPixel = 64/8;	// Number of rays per pixel 
+	unsigned int passPerPixel = 64 / 8;	// Number of rays per pixel 
 	unsigned int subPixelSampling = 4;	// Antialiasing
-	//unsigned int maxBounce = 5;
-	unsigned int maxBounce = 2;			// Maximum number of bounces
+	unsigned int maxBounce = 5;
+	//unsigned int maxBounce = 2;			// Maximum number of bounces
 
 	//scene.setDiffuseSamples(16);
 	//scene.setSpecularSamples(16);
