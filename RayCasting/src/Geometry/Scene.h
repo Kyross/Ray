@@ -207,7 +207,7 @@ namespace Geometry
 			}
 			
 			//verification intersection
-			optim(cray,"BVH");
+			optim(cray,"");
 
 
 			//Si intersection calcule selon le modele sinon background_color (noir) par defaut
@@ -215,25 +215,41 @@ namespace Geometry
 				RGBColor ie=cray.intersectionFound().triangle()->material()->getEmissive();
 				RGBColor ia = cray.intersectionFound().triangle()->material()->getAmbient();
 
-				//On ne prend pas en compte ia dans les calculs car elle fausse le résultat pour (au moins) sombrero et robot
-				I = ie + phongDirect(cray) + reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
-				//texture
-				RGBColor stexture = cray.intersectionFound().triangle()->sampleTexture(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue());
-				I = I*stexture;
+				if(m_lightSampler.hasLights()){
+					//const Triangle * toIgnore(nullptr);
+					std::pair<PointLight, const Triangle * > res = m_lightSampler.generate();
+					
+					PointLight light = res.first;
+					const Triangle * toIgnore(res.second);
+
+					//On ne prend pas en compte ia dans les calculs car elle fausse le résultat pour (au moins) sombrero et robot
+					I = ie + phongDirect(cray, light, toIgnore) + reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
+					//texture
+					RGBColor stexture = cray.intersectionFound().triangle()->sampleTexture(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue());
+					I = I*stexture;
+				
+				}
 			}
 			return I;
 		}
 
-		RGBColor phongDirect(CastedRay const &cray) {
+		RGBColor phongDirect(CastedRay const &cray, PointLight generated_light, const Triangle * toIgnore) {
 			RGBColor result(0.0, 0.0, 0.0);
 			
+			
+			if(!phongShadow(cray, generated_light, toIgnore)){
+				result = result + (phongDiffuse(cray, generated_light) + phongSpecular(cray, generated_light))*generated_light.color();
+			}
+			
 			//On verifie pour chaque lumiere si celle si eclaire notre point d'intersection
+			/*
 			for (const PointLight &light : m_lights) {
 				if (!phongShadow(cray, light)) {
 					//pas dans l'ombre donc on calcule
 					result = result +(phongDiffuse(cray, light)+phongSpecular(cray,light))*light.color();
 				}
 			}
+			*/
 			return result;
 		}
 
@@ -258,7 +274,7 @@ namespace Geometry
 			return i_diffuse;
 		}
 
-		bool phongShadow(CastedRay const &cray, PointLight const &light) {
+		bool phongShadow(CastedRay const &cray, PointLight const &light, const Triangle * toIgnore) {
 			//retourne true si dans l'ombre
 			bool shadow = false;
 
@@ -266,15 +282,26 @@ namespace Geometry
 			Math::Vector3f to_light = light.position() - cray.intersectionFound().intersection();
 
 			CastedRay cshadow(cray.intersectionFound().intersection(), to_light.normalized());
-			optim(cshadow,"BVH");
+			optim(cshadow,"");
 			if (cshadow.validIntersectionFound()) {
 				//Vecteur de l'intersection vers l'intersection du rayon shadow on regarde si l'intersection et avant la light
 				Math::Vector3f vecteur_int_shadow = cray.intersectionFound().intersection() - cshadow.intersectionFound().intersection();
 				Math::Vector3f vecteur_light = cray.intersectionFound().intersection() - light.position();
+				
+				
+				if (cshadow.intersectionFound().triangle() == toIgnore) {
+					shadow = false;
+				}
+				else {
+					shadow = true;
+				}
+				
 
+				/*
 				if (vecteur_int_shadow.norm() < vecteur_light.norm()) {
 					shadow = true;
 				}
+				*/
 			}
 			return shadow;
 		}
@@ -310,10 +337,10 @@ namespace Geometry
 			return cray.intersectionFound().triangle()->material()->getSpecular()*sendRay(creflection, depth + 1, maxDepth, diffuseSamples, specularSamples)*krefl;
 		}
 
-		void optim(CastedRay &cray, char* s="") {
+		void optim(CastedRay &cray, char* s="", const Triangle * toIgnore = nullptr) {
 			if (s=="BVH") {
 				//BVH
-				m_bvh->path(cray);
+				m_bvh->path(cray, toIgnore);
 			}
 			else {
 				optimTemp(cray);

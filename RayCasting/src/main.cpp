@@ -102,8 +102,11 @@ void initDiffuse(Geometry::Scene & scene)
 {
 	Geometry::Material * material = new Geometry::Material(RGBColor(), RGBColor(0,0,0.0), RGBColor(0.95f,0.95f,0.95f), 1, RGBColor()) ;
 	Geometry::Material * material2 = new Geometry::Material(RGBColor(), RGBColor(1.0,1.0,1.0), RGBColor(0,0,0), 1000, RGBColor()) ;
-	Geometry::Material * cubeMat = new Geometry::Material(RGBColor(), RGBColor(1, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
-	//Geometry::Material * cubeMat = new Geometry::Material(RGBColor(), RGBColor(1.0f,0.0,0.0), RGBColor(0.0,0.0,0.0), 20.0f, RGBColor(10.0,0,0)) ;
+	//Geometry::Material * cubeMat = new Geometry::Material(RGBColor(), RGBColor(1, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
+
+	Geometry::Material * cubeMat1 = new Geometry::Material(RGBColor(), RGBColor(10.0,0,0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor(0, 0, 0));
+	Geometry::Material * cubeMat2 = new Geometry::Material(RGBColor(), RGBColor(10.0,0,0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor(0.0, 0, 0));
+
 	Geometry::Cornel geo(material2, material2, material2, material2, material2, material2) ; 
 
 	geo.scaleX(10) ;
@@ -111,27 +114,35 @@ void initDiffuse(Geometry::Scene & scene)
 	geo.scaleZ(10) ;
 	scene.add(geo) ;
 
-	Geometry::Cube tmp(cubeMat) ;
+	Geometry::Cube tmp(cubeMat1) ;
 	tmp.translate(Math::makeVector(1.5,-1.5,0.0)) ;
 	scene.add(tmp) ;
 	
-	Geometry::Cube tmp2(cubeMat) ;
+	Geometry::Cube tmp2(cubeMat2) ;
 	tmp2.translate(Math::makeVector(2,1,-4)) ;
 	scene.add(tmp2) ;
 
 	// 2.2 Adds point lights in the scene 
 	{
 		Geometry::PointLight pointLight(Math::makeVector(0.0f, 0.f, 2.0f), RGBColor(0.5f, 0.5f, 0.5f));
-		scene.add(pointLight);
+		//scene.add(pointLight);
 	}
 	{
 		Geometry::PointLight pointLight2(Math::makeVector(4.f, 0.f, 0.f), RGBColor(0.5f, 0.5f, 0.5f));
-		scene.add(pointLight2);
+		//scene.add(pointLight2);
 	}
 	{
 		Geometry::Camera camera(Math::makeVector(-4.0f, 0.0f, 0.0f), Math::makeVector(0.0f, 0.0f, 0.0f), 0.3f, 1.0f, 1.0f);
 		scene.setCamera(camera);
 	}
+	//createSurfaceLigth(scene, 5);
+	
+	Geometry::Material * emissiveMat = new Geometry::Material(0, 0, 0, 0, { 1,1,1 });
+	Geometry::Square square(emissiveMat);
+	square.scale(2);
+	square.translate(Math::makeVector(0, 0, 4));
+	scene.add(square);
+	
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,10 +206,10 @@ void initDiffuseSpecular(Geometry::Scene & scene)
 {
 	Geometry::Material * material = new Geometry::Material(RGBColor(), RGBColor(0,0,0.0), RGBColor(0.7f,0.7f,0.7f), 100, RGBColor()) ;
 	Geometry::Material * material2 = new Geometry::Material(RGBColor(), RGBColor(1,1,1.0f), RGBColor(0,0,0), 1000, RGBColor()) ;
-	Geometry::Material * cubeMat = new Geometry::Material(RGBColor(), RGBColor(1.0f, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
-	Geometry::Material * cubeMat2 = new Geometry::Material(RGBColor(), RGBColor(1.0f, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
-	//Geometry::Material * cubeMat = new Geometry::Material(RGBColor(), RGBColor(0.0f,0.0,0.0), RGBColor(0.0,0.0,0.0), 20.0f, RGBColor(10.0,0,0)) ;
-	//Geometry::Material * cubeMat2 = new Geometry::Material(RGBColor(), RGBColor(0.0f,0.0,0.0), RGBColor(0.0,0.0,0.0), 20.0f, RGBColor(0.0,10,0)) ;
+	//Geometry::Material * cubeMat = new Geometry::Material(RGBColor(), RGBColor(1.0f, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
+	//Geometry::Material * cubeMat2 = new Geometry::Material(RGBColor(), RGBColor(1.0f, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
+	Geometry::Material * cubeMat = new Geometry::Material(RGBColor(), RGBColor(0.0f,0.0,0.0), RGBColor(0.0,0.0,0.0), 20.0f, RGBColor(10.0,0,0)) ;
+	Geometry::Material * cubeMat2 = new Geometry::Material(RGBColor(), RGBColor(0.0f,0.0,0.0), RGBColor(0.0,0.0,0.0), 20.0f, RGBColor(0.0,10,0)) ;
 	Geometry::Cornel geo(material2, material2, material, material, material, material) ; //new Geometry::Cube(material2) ;////new Cone(4, material) ; //new Geometry::Cylinder(5, 1, 1, material) ;////////new Geometry::Cube(material) ;////; //new Geometry::Cube(material) ; //new Geometry::Cylinder(100, 2, 1, material) ; //
 
 	geo.scaleX(10) ;
@@ -256,6 +267,8 @@ void initGarage(Geometry::Scene & scene)
 		scene.setCamera(camera);
 	}
 	createGround(scene);
+	createSurfaceLigth(scene, 500);
+
 }
 
 /// <summary>
@@ -459,6 +472,7 @@ void initBoat(Geometry::Scene & scene)
 		scene.setCamera(camera);
 	}
 	createGround(scene);
+	createSurfaceLigth(scene, 4000);
 }
 
 /// <summary>
@@ -681,11 +695,11 @@ int main(int argc, char ** argv)
 
 	
 	// 2.1 initializes the geometry (choose only one initialization)
-	//initDiffuse(scene) ;
+	initDiffuse(scene) ;
 	//initDiffuseSpecular(scene) ;
 	//initSpecular(scene) ;
 	//initGuitar(scene);
-	initDog(scene);
+	//initDog(scene);
 	//initGarage(scene);
 	//initTemple(scene);
 	//initRobot(scene);
@@ -699,10 +713,10 @@ int main(int argc, char ** argv)
 	scene.printStats();
 
 	// 3 - Computes the scene
-	unsigned int passPerPixel = 64/8;	// Number of rays per pixel 
+	unsigned int passPerPixel = 64 / 8;	// Number of rays per pixel 
 	unsigned int subPixelSampling = 4;	// Antialiasing
-	//unsigned int maxBounce = 5;
-	unsigned int maxBounce = 2;			// Maximum number of bounces
+	unsigned int maxBounce = 5;
+	//unsigned int maxBounce = 2;			// Maximum number of bounces
 
 	//scene.setDiffuseSamples(16);
 	//scene.setSpecularSamples(16);
