@@ -1,5 +1,5 @@
-#ifndef _Geometry_LightSource_H
-#define _Geometry_LightSource_H
+#ifndef _Geometry_Sampler_H
+#define _Geometry_Sampler_H
 
 #include <random>
 #include <Geometry/Triangle.h>
@@ -9,48 +9,28 @@
 namespace Geometry
 {
 	/// <summary>
-	/// Abstract class
+	/// A light sampler. To initialize this sampler, just add triangles or geometries. The sampler
+	/// will keep triangles with a material that emits light.
 	/// </summary>
-	class LightSource : public Geometry
+	class Sampler
 	{
 	protected:
 		/// <summary> A random number generator. </summary>
 		mutable std::mt19937_64 randomGenerator;
 		::std::vector<double> surfaceSum;
-		//::std::vector<Triangle> allTriangles; //Faire vector de const Triangle * 
-		::std::vector<const Triangle * > allTriangles;
+		::std::vector<Triangle> allTriangles;
 		double currentSum;
-		Math::Vector3f m_position;
 
 	public:
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		LightSource(Math::Vector3f position)
-			: m_position(position),currentSum(0.0), Geometry()
-		{}
-		
+		/*LightSampler()
+			: currentSum(0.0)
+		{}*/
 
-		/// <summary>
-		/// Genates a point light by sampling the kept triangles.
-		/// </summary>
-		/// <returns></returns>
-		virtual std::pair<PointLight, const Triangle * > generate() const = 0 {}
+		virtual PointLight generate() const = 0;
 
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// \fn	const Math::Vector3 & PointLight::position() const
-		///
-		/// \brief	Gets the position of the light.
-		///
-		/// \author	F. Lamarche, Université de Rennes 1
-		/// \date	04/12/2013
-		///
-		/// \return	.
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-		const Math::Vector3f & position() const
-		{
-			return m_position;
-		}
 
 		/// <summary>
 		/// Adds a triangle to the light sampler.
@@ -62,7 +42,7 @@ namespace Geometry
 			{
 				currentSum += triangle.surface()/**it->material()->getEmissive().grey()*/;
 				surfaceSum.push_back(currentSum);
-				allTriangles.push_back(&triangle);
+				allTriangles.push_back(triangle);
 			}
 		}
 
@@ -126,4 +106,5 @@ namespace Geometry
 		}
 	};
 }
+
 #endif

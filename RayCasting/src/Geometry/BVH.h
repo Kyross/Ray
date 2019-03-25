@@ -135,9 +135,9 @@ namespace Geometry {
 
 		void computeBVH(BVHNode * current) {
 			::std::deque <const Triangle*> left_list, right_list, leftListMin, rightListMin;
-			float ct = 1;
-			float ci = 0.5;
-			float cmin = 100.0;
+			double ct = 1;
+			double ci = 0.5;
+			double cmin = 100.0;
 
 			for (int axis = 0; axis < 3; axis++) {
 				left_list.clear();
@@ -158,11 +158,11 @@ namespace Geometry {
 				BVHNode filsGaucheTemp = BVHNode(left_list);
 				BVHNode filsDroitTemp = BVHNode(right_list);
 
-				float Sb = computeSurface(current->m_boundingVolume);
-				float SbL = computeSurface(filsGaucheTemp.m_boundingVolume);
-				float SbR = computeSurface(filsDroitTemp.m_boundingVolume);
+				double Sb = computeSurface(current->m_boundingVolume);
+				double SbL = computeSurface(filsGaucheTemp.m_boundingVolume);
+				double SbR = computeSurface(filsDroitTemp.m_boundingVolume);
 
-				float c = ct + (SbL / Sb) * ci + (SbR / Sb) * ci;
+				double c = ct + (SbL / Sb) * ci + (SbR / Sb) * ci;
 
 				if (c >= current->m_primitives.size()*ci) {
 					return;
@@ -182,10 +182,10 @@ namespace Geometry {
 				computeBVH(current->m_filsDroit);
 		}
 
-		float computeSurface(BoundingBox bbox) {
-			float dx = bbox.max()[0] - bbox.min()[0];
-			float dy = bbox.max()[1] - bbox.min()[1];
-			float dz = bbox.max()[2] - bbox.min()[2];
+		double computeSurface(BoundingBox bbox) {
+			double dx = bbox.max()[0] - bbox.min()[0];
+			double dy = bbox.max()[1] - bbox.min()[1];
+			double dz = bbox.max()[2] - bbox.min()[2];
 		
 			return 2 * (dx * dy + dx * dz + dy * dz);
 		}

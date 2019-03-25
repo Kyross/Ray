@@ -16,7 +16,7 @@
 #include <random>
 #include <Geometry/LightSampler.h>
 #include <Geometry/BVH.h>
-
+#include <Geometry/LightSource.h>
 namespace Geometry
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ namespace Geometry
 		::std::deque<::std::pair<BoundingBox, Geometry> > m_geometries ;
 		//Geometry m_geometry ;
 		/// \brief	The lights.
-		std::vector<PointLight> m_lights ;
+		//std::vector<LightSource*> m_lights ;
 		/// \brief	The camera.
 		Camera m_camera ;
 		/// \brief The scene bounding box
@@ -54,7 +54,8 @@ namespace Geometry
 		/// <summary>
 		/// The light sampler associated with the scene
 		/// </summary>
-		LightSampler m_lightSampler;
+		//LightSampler m_lightSampler;
+		::std::vector<LightSource*> m_lightSampler;
 		//La structure d'optimisation qui va permettre d'optimiser le calcul d'intersections
 		BVH *m_bvh;
 
@@ -151,20 +152,20 @@ namespace Geometry
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// \fn	void Scene::add(PointLight * light)
+		/// \fn	void Scene::add(LightSource * light)
 		///
-		/// \brief	Adds a poitn light in the scene.
+		/// \brief	Adds a light source in the scene.
 		///
 		/// \author	F. Lamarche, Université de Rennes 1
 		/// \date	04/12/2013
 		///
 		/// \param [in,out]	light	If non-null, the light to add.
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		void add(const PointLight & light)
+		void add(LightSource *light)
 		{
-			m_lights.push_back(light) ;
+			m_lightSampler.push_back(light);
+			add(*light);
 		}
-
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	void Scene::setCamera(Camera const & cam)
 		///
@@ -215,32 +216,56 @@ namespace Geometry
 				RGBColor ie=cray.intersectionFound().triangle()->material()->getEmissive();
 				RGBColor ia = cray.intersectionFound().triangle()->material()->getAmbient();
 
+				/* BUGUÉ
 				if(m_lightSampler.hasLights()){
 					//const Triangle * toIgnore(nullptr);
 					std::pair<PointLight, const Triangle * > res = m_lightSampler.generate();
 					
 					PointLight light = res.first;
 					const Triangle * toIgnore(res.second);
+				*/
 
 					//On ne prend pas en compte ia dans les calculs car elle fausse le résultat pour (au moins) sombrero et robot
-					I = ie + phongDirect(cray, light, toIgnore) + reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
+					I = ie + phongDirect(cray) + reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
 					//texture
 					RGBColor stexture = cray.intersectionFound().triangle()->sampleTexture(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue());
 					I = I*stexture;
 				
-				}
+				//}
 			}
 			return I;
 		}
 
-		RGBColor phongDirect(CastedRay const &cray, PointLight generated_light, const Triangle * toIgnore) {
+		//RGBColor phongDirect(CastedRay const &cray, PointLight generated_light, const Triangle * toIgnore) {
+		RGBColor phongDirect(CastedRay const &cray) {
 			RGBColor result(0.0, 0.0, 0.0);
 			
-			
+			//Global illumination
+			/* SUREMENT BUGUÉ
 			if(!phongShadow(cray, generated_light, toIgnore)){
 				result = result + (phongDiffuse(cray, generated_light) + phongSpecular(cray, generated_light))*generated_light.color();
 			}
+			*/
 			
+			for (const LightSource *source : m_lightSampler) {
+				
+				if (source->hasLights()) {
+
+					std::pair<PointLight, const Triangle * > res = source->generate();
+					
+					PointLight light = res.first;
+					const Triangle * toIgnore(res.second);
+
+					if (!phongShadow(cray, light, toIgnore)) {
+						//pas dans l'ombre donc on calcule
+						result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
+					}
+				}
+			}
+			//////
+
+			/*
+			//Raytracing
 			//On verifie pour chaque lumiere si celle si eclaire notre point d'intersection
 			/*
 			for (const PointLight &light : m_lights) {
@@ -288,20 +313,22 @@ namespace Geometry
 				Math::Vector3f vecteur_int_shadow = cray.intersectionFound().intersection() - cshadow.intersectionFound().intersection();
 				Math::Vector3f vecteur_light = cray.intersectionFound().intersection() - light.position();
 				
-				
+				//std::cout << "ToIgnore : " << toIgnore << " | Intersected : "<< cshadow.intersectionFound().triangle() <<std::endl;
+
+				/* MARCHE PAS FUCK
 				if (cshadow.intersectionFound().triangle() == toIgnore) {
 					shadow = false;
 				}
 				else {
 					shadow = true;
 				}
-				
+				*/
 
-				/*
 				if (vecteur_int_shadow.norm() < vecteur_light.norm()) {
 					shadow = true;
 				}
-				*/
+				
+
 			}
 			return shadow;
 		}
@@ -324,7 +351,7 @@ namespace Geometry
 			return i_specular;
 		}
 
-		RGBColor reflection(CastedRay const & cray, int const &depth, int const &maxDepth, int const & diffuseSamples, int const &specularSamples, float const &krefl)
+		RGBColor reflection(CastedRay const & cray, int const &depth, int const &maxDepth, int const & diffuseSamples, int const &specularSamples, double const &krefl)
 		{
 			//Eclairage indirect
 			//normal du triangle intersecte
@@ -385,11 +412,13 @@ namespace Geometry
 		void compute(int maxDepth, int subPixelDivision = 1, int passPerPixel = 1)
 		{
 			buildBVH();
+			/*
 			// We prepare the light sampler (the sampler only stores triangles with a non null emissive component).
 			for (auto it = m_geometries.begin(), end = m_geometries.end(); it != end; ++it)
 			{
-				m_lightSampler.add(it->second);
-			}
+				//emissive a voir
+				//m_lightSampler.add(it->second);
+			}*/
 
 			// Step on x and y for subpixel sampling
 			double step = 1.0f/subPixelDivision ;
