@@ -20,6 +20,7 @@
 #include <Geometry/BoundingBox.h>
 #include <omp.h>
 #include <Geometry/BVH.h>
+#include <Geometry/LightSurface.h>
 
 /// <summary>
 /// The directory of the 3D objetcs
@@ -102,20 +103,23 @@ void initDiffuse(Geometry::Scene & scene)
 {
 	Geometry::Material * material = new Geometry::Material(RGBColor(), RGBColor(0,0,0.0), RGBColor(0.95f,0.95f,0.95f), 1, RGBColor()) ;
 	Geometry::Material * material2 = new Geometry::Material(RGBColor(), RGBColor(1.0,1.0,1.0), RGBColor(0,0,0), 1000, RGBColor()) ;
-	Geometry::Material * cubeMat = new Geometry::Material(RGBColor(), RGBColor(1, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
-	//Geometry::Material * cubeMat = new Geometry::Material(RGBColor(), RGBColor(1.0f,0.0,0.0), RGBColor(0.0,0.0,0.0), 20.0f, RGBColor(10.0,0,0)) ;
-	Geometry::Cornel geo(material2, material2, material2, material2, material2, material2) ; 
+	Geometry::Material * redEmissive = new Geometry::Material(RGBColor(), RGBColor(1.0f,0.0,0.0), RGBColor(0.0,0.0,0.0), 20.0f, RGBColor(10.0,0,0)) ; //emissive
+	Geometry::Material * redMat = new Geometry::Material(RGBColor(), RGBColor(1, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
+	Geometry::Material * greenMat = new Geometry::Material(RGBColor(), RGBColor(0.0, 1.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
+	Geometry::Material * blueMat = new Geometry::Material(RGBColor(), RGBColor(0.0, 0.0, 1.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
+
+	Geometry::Cornel geo(material2, material2, material2, blueMat, redMat, greenMat) ;
 
 	geo.scaleX(10) ;
 	geo.scaleY(10) ;
 	geo.scaleZ(10) ;
 	scene.add(geo) ;
 
-	Geometry::Cube tmp(cubeMat) ;
+	Geometry::Cube tmp(redMat) ;
 	tmp.translate(Math::makeVector(1.5,-1.5,0.0)) ;
 	scene.add(tmp) ;
 	
-	Geometry::Cube tmp2(cubeMat) ;
+	Geometry::Cube tmp2(redMat) ;
 	tmp2.translate(Math::makeVector(2,1,-4)) ;
 	scene.add(tmp2) ;
 
@@ -131,6 +135,11 @@ void initDiffuse(Geometry::Scene & scene)
 	{
 		Geometry::Camera camera(Math::makeVector(-4.0f, 0.0f, 0.0f), Math::makeVector(0.0f, 0.0f, 0.0f), 0.3f, 1.0f, 1.0f);
 		scene.setCamera(camera);
+	}
+	{
+		//SurfaceLight
+		Geometry::LightSurface * surfaceLight1 = new Geometry::LightSurface(Math::makeVector(0.0f, 0.0f, 4.0f),2);
+		scene.add(surfaceLight1);
 	}
 }
 

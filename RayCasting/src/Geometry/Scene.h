@@ -16,6 +16,7 @@
 #include <random>
 #include <Geometry/LightSampler.h>
 #include <Geometry/BVH.h>
+#include <Geometry/LightSource.h>
 
 namespace Geometry
 {
@@ -57,6 +58,8 @@ namespace Geometry
 		LightSampler m_lightSampler;
 		//La structure d'optimisation qui va permettre d'optimiser le calcul d'intersections
 		BVH *m_bvh;
+		bool m_GI_surface = true;
+		std::vector<LightSource*> m_lightSource;
 
 	public:
 
@@ -165,6 +168,11 @@ namespace Geometry
 			m_lights.push_back(light) ;
 		}
 
+		void add(LightSource * light)
+		{
+			m_lightSource.push_back(light);
+		}
+
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	void Scene::setCamera(Camera const & cam)
 		///
@@ -227,13 +235,25 @@ namespace Geometry
 		RGBColor phongDirect(CastedRay const &cray) {
 			RGBColor result(0.0, 0.0, 0.0);
 			
-			//On verifie pour chaque lumiere si celle si eclaire notre point d'intersection
-			for (const PointLight &light : m_lights) {
-				if (!phongShadow(cray, light)) {
-					//pas dans l'ombre donc on calcule
-					result = result +(phongDiffuse(cray, light)+phongSpecular(cray,light))*light.color();
+			if (m_GI_surface) {
+				for (LightSource *source : m_lightSource) {
+					PointLight light = source->generate();
+					if (!phongShadow(cray, light)) {
+						//pas dans l'ombre donc on calcule
+						result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
+					}
 				}
 			}
+			else {
+				//On verifie pour chaque lumiere si celle si eclaire notre point d'intersection
+				for (const PointLight &light : m_lights) {
+					if (!phongShadow(cray, light)) {
+						//pas dans l'ombre donc on calcule
+						result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
+					}
+				}
+			}
+
 			return result;
 		}
 
