@@ -681,7 +681,7 @@ int main(int argc, char ** argv)
 
 	
 	// 2.1 initializes the geometry (choose only one initialization)
-	//initDiffuse(scene) ;
+	initDiffuse(scene) ;
 	//initDiffuseSpecular(scene) ;
 	//initSpecular(scene) ;
 	//initGuitar(scene);
@@ -694,7 +694,7 @@ int main(int argc, char ** argv)
 	//initSombrero(scene);
 	//initTibetHouse(scene);
 	//initTibetHouseInside(scene);
-	initMedievalCity(scene);
+	//initMedievalCity(scene);
 	// Shows stats
 	scene.printStats();
 
