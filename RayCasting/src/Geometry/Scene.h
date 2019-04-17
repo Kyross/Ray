@@ -16,6 +16,7 @@
 #include <random>
 #include <Geometry/LightSampler.h>
 #include <Geometry/BVH.h>
+#include <Geometry/LightSource.h>
 
 namespace Geometry
 {
@@ -57,6 +58,8 @@ namespace Geometry
 		LightSampler m_lightSampler;
 		//La structure d'optimisation qui va permettre d'optimiser le calcul d'intersections
 		BVH *m_bvh;
+		bool m_GI_surface = true;
+		std::vector<LightSource*> m_lightSource;
 
 	public:
 
@@ -165,6 +168,12 @@ namespace Geometry
 			m_lights.push_back(light) ;
 		}
 
+		void add(LightSource * light)
+		{
+			m_lightSource.push_back(light);
+			add(*light);
+		}
+
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	void Scene::setCamera(Camera const & cam)
 		///
@@ -227,13 +236,27 @@ namespace Geometry
 		RGBColor phongDirect(CastedRay const &cray) {
 			RGBColor result(0.0, 0.0, 0.0);
 			
-			//On verifie pour chaque lumiere si celle si eclaire notre point d'intersection
-			for (const PointLight &light : m_lights) {
-				if (!phongShadow(cray, light)) {
-					//pas dans l'ombre donc on calcule
-					result = result +(phongDiffuse(cray, light)+phongSpecular(cray,light))*light.color();
+			if (m_GI_surface) {
+				for (LightSource *source : m_lightSource) {
+					if (source->hasLights()) {
+						PointLight light = source->generate();
+						if (!phongShadow(cray, light)) {
+							//pas dans l'ombre donc on calcule
+							result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
+						}
+					}
 				}
 			}
+			else {
+				//On verifie pour chaque lumiere si celle si eclaire notre point d'intersection
+				for (const PointLight &light : m_lights) {
+					if (!phongShadow(cray, light)) {
+						//pas dans l'ombre donc on calcule
+						result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
+					}
+				}
+			}
+
 			return result;
 		}
 
@@ -259,23 +282,14 @@ namespace Geometry
 		}
 
 		bool phongShadow(CastedRay const &cray, PointLight const &light) {
-			//retourne true si dans l'ombre
 			bool shadow = false;
+			CastedRay cshadow(light.position(), cray.intersectionFound().intersection() - light.position());
 
-			//direction de la light vers l'intersection
-			Math::Vector3f to_light = light.position() - cray.intersectionFound().intersection();
-
-			CastedRay cshadow(cray.intersectionFound().intersection(), to_light.normalized());
-			optim(cshadow,"BVH");
+			optim(cshadow, "BVH");
 			if (cshadow.validIntersectionFound()) {
-				//Vecteur de l'intersection vers l'intersection du rayon shadow on regarde si l'intersection et avant la light
-				Math::Vector3f vecteur_int_shadow = cray.intersectionFound().intersection() - cshadow.intersectionFound().intersection();
-				Math::Vector3f vecteur_light = cray.intersectionFound().intersection() - light.position();
-
-				if (vecteur_int_shadow.norm() < vecteur_light.norm()) {
-					shadow = true;
-				}
+				shadow = !(cshadow.intersectionFound().triangle()->center() == cray.intersectionFound().triangle()->center());
 			}
+
 			return shadow;
 		}
 
