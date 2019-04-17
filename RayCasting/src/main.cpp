@@ -138,7 +138,7 @@ void initDiffuse(Geometry::Scene & scene)
 	}
 	{
 		//SurfaceLight
-		Geometry::LightSurface * surfaceLight1 = new Geometry::LightSurface(Math::makeVector(0.0f, 0.0f, 4.0f),2);
+		Geometry::LightSurface * surfaceLight1 = new Geometry::LightSurface(Math::makeVector(0.0f, 0.0f, 4.5f),2);
 		scene.add(surfaceLight1);
 	}
 }
