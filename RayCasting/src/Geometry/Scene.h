@@ -39,7 +39,7 @@ namespace Geometry
 		::std::deque<::std::pair<BoundingBox, Geometry> > m_geometries ;
 		//Geometry m_geometry ;
 		/// \brief	The lights.
-		std::vector<PointLight> m_lights ;
+		//std::vector<LightSource*> m_lights ;
 		/// \brief	The camera.
 		Camera m_camera ;
 		/// \brief The scene bounding box
@@ -63,6 +63,8 @@ namespace Geometry
 		BVH *m_bvh;
 		bool m_GI_surface = true;
 		std::vector<LightSource*> m_lightSource;
+
+		//LightSurface m_SAMPLER;
 
 		//LightSurface m_SAMPLER;
 
@@ -233,6 +235,7 @@ namespace Geometry
 			return I;
 		}
 
+		//RGBColor phongDirect(CastedRay const &cray, PointLight generated_light, const Triangle * toIgnore) {
 		RGBColor phongDirect(CastedRay const &cray) {
 			RGBColor result(0.0, 0.0, 0.0);
 			
@@ -265,7 +268,6 @@ namespace Geometry
 					}
 				}
 			}
-
 			return result;
 		}
 
@@ -290,7 +292,7 @@ namespace Geometry
 			return i_diffuse;
 		}
 
-		bool phongShadow(CastedRay const &cray, PointLight const &light) {
+		bool phongShadow(CastedRay const &cray, PointLight const &light, const Triangle * toIgnore) {
 			//retourne true si dans l'ombre
 			bool shadow = false;
 			CastedRay cshadow(light.position(), cray.intersectionFound().intersection() - light.position());

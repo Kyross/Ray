@@ -160,6 +160,14 @@ void initDiffuse(Geometry::Scene & scene)
 		Geometry::Camera camera(Math::makeVector(-4.0f, 0.0f, 0.0f), Math::makeVector(0.0f, 0.0f, 0.0f), 0.3f, 1.0f, 1.0f);
 		scene.setCamera(camera);
 	}
+	//createSurfaceLigth(scene, 5);
+	/*
+	Geometry::Material * emissiveMat = new Geometry::Material(0, 0, 0, 0, { 1,1,1 });
+	Geometry::Square square(emissiveMat);
+	square.scale(2);
+	square.translate(Math::makeVector(0, 0, 4));
+	scene.add(square);
+	*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -701,8 +709,8 @@ int main(int argc, char ** argv)
 	omp_set_num_threads(8);
 
 	// 1 - Initializes a window for rendering
-	//Visualizer::Visualizer visu(1000,1000) ;
-	Visualizer::Visualizer visu(500, 500);
+	Visualizer::Visualizer visu(1000,1000) ;
+	//Visualizer::Visualizer visu(500, 500);
 	//Visualizer::Visualizer visu(300,300) ;
 	
 	// 2 - Initializes the scene
