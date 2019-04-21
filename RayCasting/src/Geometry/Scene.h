@@ -27,7 +27,7 @@ namespace Geometry
 	/// 		allowing to add geometry, lights and a camera are provided. Scene rendering is achieved by
 	/// 		calling the Scene::compute method.
 	///
-	/// \author	F. Lamarche, Université de Rennes 1
+	/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 	/// \date	03/12/2013
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	class Scene
@@ -48,18 +48,25 @@ namespace Geometry
 		size_t m_diffuseSamples ;
 		/// \brief Number of specular samples 
 		size_t m_specularSamples ;
-		/// \brief Number of light samples 
+		/// \brief Number of light samples (per light)
 		size_t m_lightSamples;
 		/// brief Rendering pass number
 		int m_pass;
 		/// <summary>
 		/// The light sampler associated with the scene
 		/// </summary>
-		LightSampler m_lightSampler;
+
+		//LightSampler m_lightSampler;
+		//Les sources de lumiere de la scene
+		::std::vector<LightSource*> m_lightSampler;
 		//La structure d'optimisation qui va permettre d'optimiser le calcul d'intersections
 		BVH *m_bvh;
 		bool m_GI_surface = true;
 		std::vector<LightSource*> m_lightSource;
+
+		//LightSurface m_SAMPLER;
+
+		//LightSurface m_SAMPLER;
 
 	public:
 
@@ -68,7 +75,7 @@ namespace Geometry
 		///
 		/// \brief	Constructor.
 		///
-		/// \author	F. Lamarche, Université de Rennes 1
+		/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 		/// \date	03/12/2013
 		///
 		/// \param [in,out]	visu	If non-null, the visu.
@@ -132,7 +139,7 @@ namespace Geometry
 		///
 		/// \brief	Adds a geometry to the scene.
 		///
-		/// \author	F. Lamarche, Université de Rennes 1
+		/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 		/// \date	03/12/2013
 		///
 		/// \param	geometry The geometry to add.
@@ -154,24 +161,19 @@ namespace Geometry
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// \fn	void Scene::add(PointLight * light)
+		/// \fn	void Scene::add(LightSource * light)
 		///
-		/// \brief	Adds a poitn light in the scene.
+		/// \brief	Adds a light source in the scene.
 		///
-		/// \author	F. Lamarche, Université de Rennes 1
+		/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 		/// \date	04/12/2013
 		///
 		/// \param [in,out]	light	If non-null, the light to add.
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		void add(const PointLight & light)
+		void add(LightSource *light)
 		{
-			m_lights.push_back(light) ;
-		}
-
-		void add(LightSource * light)
-		{
-			m_lightSource.push_back(light);
-			add(*light);
+			m_lightSampler.push_back(light);
+			add(*light);			
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,7 +181,7 @@ namespace Geometry
 		///
 		/// \brief	Sets the camera.
 		///
-		/// \author	F. Lamarche, Université de Rennes 1
+		/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 		/// \date	04/12/2013
 		///
 		/// \param	cam	The camera.
@@ -194,7 +196,7 @@ namespace Geometry
 		///
 		/// \brief	Sends a ray in the scene and returns the computed color
 		///
-		/// \author	F. Lamarche, Université de Rennes 1
+		/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 		/// \date	04/12/2013
 		///
 		/// \param	ray			The ray.
@@ -216,7 +218,7 @@ namespace Geometry
 			}
 			
 			//verification intersection
-			optim(cray,"BVH");
+			optim(cray,"BVH", nullptr);
 
 
 			//Si intersection calcule selon le modele sinon background_color (noir) par defaut
@@ -224,39 +226,48 @@ namespace Geometry
 				RGBColor ie=cray.intersectionFound().triangle()->material()->getEmissive();
 				RGBColor ia = cray.intersectionFound().triangle()->material()->getAmbient();
 
-				//On ne prend pas en compte ia dans les calculs car elle fausse le résultat pour (au moins) sombrero et robot
+				//On ne prend pas en compte ia dans les calculs car elle fausse le rï¿½sultat pour (au moins) sombrero et robot
 				I = ie + phongDirect(cray) + reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
 				//texture
 				RGBColor stexture = cray.intersectionFound().triangle()->sampleTexture(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue());
-				I = I*stexture;
+				I = I * stexture;
 			}
 			return I;
 		}
 
+		//RGBColor phongDirect(CastedRay const &cray, PointLight generated_light, const Triangle * toIgnore) {
 		RGBColor phongDirect(CastedRay const &cray) {
 			RGBColor result(0.0, 0.0, 0.0);
 			
 			if (m_GI_surface) {
-				for (LightSource *source : m_lightSource) {
-					if (source->hasLights()) {
-						PointLight light = source->generate();
-						if (!phongShadow(cray, light)) {
-							//pas dans l'ombre donc on calcule
-							result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
-						}
+				for (const LightSource *source : m_lightSampler) {
+				
+				::std::vector< std::pair<PointLight, const Triangle *> > sampledLights;
+
+				for (int i = 0; i < m_lightSamples; i++) {
+					
+					sampledLights.push_back(source->generate());
+				}
+				
+				std::pair<PointLight, const Triangle * > res = source->generate();
+					
+				PointLight light = res.first;
+				const Triangle * toIgnore(res.second);
+				if (!phongShadow(cray, light)) {
+					//pas dans l'ombre donc on calcule
+					result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
 					}
 				}
 			}
 			else {
 				//On verifie pour chaque lumiere si celle si eclaire notre point d'intersection
-				for (const PointLight &light : m_lights) {
+				for (const PointLight & light : m_lights) {
 					if (!phongShadow(cray, light)) {
 						//pas dans l'ombre donc on calcule
 						result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
 					}
 				}
 			}
-
 			return result;
 		}
 
@@ -268,7 +279,7 @@ namespace Geometry
 			//normal du triangle intersecte
 			Math::Vector3f N = cray.intersectionFound().triangle()->sampleNormal(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue(), cray.source());
 			//Math::Vector3f N = cray.intersectionFound().triangle()->normal();
-			//Si le produit scalaire entre la normale du triangle et la direction du regard est negatif, on prend l'opposé de la normale du triangle
+			//Si le produit scalaire entre la normale du triangle et la direction du regard est negatif, on prend l'opposï¿½ de la normale du triangle
 			if (N*cray.direction() < 0) N = -N;
 
 			//direction de la l'intersection vers la light
@@ -282,6 +293,7 @@ namespace Geometry
 		}
 
 		bool phongShadow(CastedRay const &cray, PointLight const &light) {
+			//retourne true si dans l'ombre
 			bool shadow = false;
 			CastedRay cshadow(light.position(), cray.intersectionFound().intersection() - light.position());
 
@@ -311,7 +323,7 @@ namespace Geometry
 			return i_specular;
 		}
 
-		RGBColor reflection(CastedRay const & cray, int const &depth, int const &maxDepth, int const & diffuseSamples, int const &specularSamples, float const &krefl)
+		RGBColor reflection(CastedRay const & cray, int const &depth, int const &maxDepth, int const & diffuseSamples, int const &specularSamples, double const &krefl)
 		{
 			//Eclairage indirect
 			//normal du triangle intersecte
@@ -324,10 +336,10 @@ namespace Geometry
 			return cray.intersectionFound().triangle()->material()->getSpecular()*sendRay(creflection, depth + 1, maxDepth, diffuseSamples, specularSamples)*krefl;
 		}
 
-		void optim(CastedRay &cray, char* s="") {
+		void optim(CastedRay &cray, char* s="", const Triangle * toIgnore = nullptr) {
 			if (s=="BVH") {
 				//BVH
-				m_bvh->path(cray);
+				m_bvh->path(cray, toIgnore);
 			}
 			else {
 				optimTemp(cray);
@@ -363,7 +375,7 @@ namespace Geometry
 		///
 		/// \brief	Computes a rendering of the current scene, viewed by the camera.
 		/// 		
-		/// \author	F. Lamarche, Université de Rennes 1
+		/// \author	F. Lamarche, Universitï¿½ de Rennes 1
 		/// \date	04/12/2013
 		///
 		/// \param	maxDepth	The maximum recursive depth.
@@ -371,12 +383,17 @@ namespace Geometry
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		void compute(int maxDepth, int subPixelDivision = 1, int passPerPixel = 1)
 		{
+			
 			buildBVH();
 			// We prepare the light sampler (the sampler only stores triangles with a non null emissive component).
+			/*
 			for (auto it = m_geometries.begin(), end = m_geometries.end(); it != end; ++it)
 			{
-				m_lightSampler.add(it->second);
+				//emissive a voir
+				//m_lightSampler.add(it->second);
+				m_SAMPLER.add(it->second);
 			}
+			*/
 
 			// Step on x and y for subpixel sampling
 			double step = 1.0f/subPixelDivision ;

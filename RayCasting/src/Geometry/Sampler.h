@@ -1,5 +1,5 @@
-#ifndef _Geometry_LightSampler_H
-#define _Geometry_LightSampler_H
+#ifndef _Geometry_Sampler_H
+#define _Geometry_Sampler_H
 
 #include <random>
 #include <Geometry/Triangle.h>
@@ -12,23 +12,25 @@ namespace Geometry
 	/// A light sampler. To initialize this sampler, just add triangles or geometries. The sampler
 	/// will keep triangles with a material that emits light.
 	/// </summary>
-	class LightSampler
+	class Sampler
 	{
 	protected:
 		/// <summary> A random number generator. </summary>
 		mutable std::mt19937_64 randomGenerator;
 		::std::vector<double> surfaceSum;
-		//::std::vector<Triangle> allTriangles; //Faire vector de const Triangle * 
-		::std::vector<const Triangle * > allTriangles;
-		double currentSum ;
+		::std::vector<Triangle> allTriangles;
+		double currentSum;
 
 	public:
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		LightSampler()
+		/*LightSampler()
 			: currentSum(0.0)
-		{}
+		{}*/
+
+		virtual PointLight generate() const = 0;
+
 
 		/// <summary>
 		/// Adds a triangle to the light sampler.
@@ -40,7 +42,7 @@ namespace Geometry
 			{
 				currentSum += triangle.surface()/**it->material()->getEmissive().grey()*/;
 				surfaceSum.push_back(currentSum);
-				allTriangles.push_back(&triangle);
+				allTriangles.push_back(triangle);
 			}
 		}
 
@@ -64,27 +66,6 @@ namespace Geometry
 			{
 				add(*it);
 			}
-		}
-
-		/// <summary>
-		/// Genates a point light by sampling the kept triangles.
-		/// </summary>
-		/// <returns></returns>
-		std::pair<PointLight, const Triangle * > generate() const
-		{
-			double random = double(randomGenerator()) / double(randomGenerator.max());
-			random = random * currentSum;
-			auto found = std::lower_bound(surfaceSum.begin(), surfaceSum.end(), random);
-			size_t index = found - surfaceSum.begin();
-			Math::Vector3f barycentric = allTriangles[index]->randomBarycentric();
-			Math::Vector3f point = allTriangles[index]->pointFromBraycentric(barycentric);
-			RGBColor color = allTriangles[index]->sampleTexture(barycentric);
-
-			const Triangle * toIgnore = allTriangles[index];
-			PointLight light(point, allTriangles[index]->material()->getEmissive()*color);
-
-			std::pair<PointLight, const Triangle * > res(light, toIgnore);
-			return res;
 		}
 
 		/// <summary>
