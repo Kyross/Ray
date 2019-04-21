@@ -9,7 +9,7 @@ namespace Geometry
 	{
 	public:
 
-		LightSurface(Math::Vector3f position,double height=1,double witdh=1, Material * ematerial = nullptr)
+		LightSurface(Math::Vector3f position, double height = 1, double witdh = 1, Material * ematerial = nullptr)
 			: LightSource(position)
 		{
 			ematerial = new Material(0, 0, 0, 0, { 1,1,1 });
@@ -23,23 +23,27 @@ namespace Geometry
 			this->scaleY(height);
 			this->translate(m_position);
 
-			for (const Triangle &t : getTriangles()) {
-				add(t);
-			}
+			auto & triangles = getTriangles();
+			add(triangles.begin(), triangles.end());
+
 		}
 
-		// H�rit� via SourceLight
-		PointLight LightSurface::generate() const
+		// Hérité via SourceLight
+		std::pair<PointLight, const Triangle * > generate() const
 		{
 			double random = double(randomGenerator()) / double(randomGenerator.max());
 			random = random * currentSum;
 			auto found = std::lower_bound(surfaceSum.begin(), surfaceSum.end(), random);
 			size_t index = found - surfaceSum.begin();
-			Math::Vector3f barycentric = allTriangles[index].randomBarycentric();
-			Math::Vector3f point = allTriangles[index].pointFromBraycentric(barycentric);
-			RGBColor color = allTriangles[index].sampleTexture(barycentric);
+			Math::Vector3f barycentric = allTriangles[index]->randomBarycentric();
+			Math::Vector3f point = allTriangles[index]->pointFromBraycentric(barycentric);
+			RGBColor color = allTriangles[index]->sampleTexture(barycentric);
 
-			return PointLight(point, allTriangles[index].material()->getEmissive()*color);
+			const Triangle * toIgnore = allTriangles[index];
+			PointLight light(point, allTriangles[index]->material()->getEmissive()*color);
+
+			std::pair<PointLight, const Triangle * > res(light, toIgnore);
+			return res;
 		}
 	};
 }

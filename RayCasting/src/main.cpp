@@ -111,7 +111,7 @@ void initDiffuse(Geometry::Scene & scene)
 	Geometry::Material * material = new Geometry::Material(RGBColor(), RGBColor(0,0,0.0), RGBColor(0.95f,0.95f,0.95f), 1, RGBColor()) ;
 	Geometry::Material * material2 = new Geometry::Material(RGBColor(), RGBColor(1.0,1.0,1.0), RGBColor(0,0,0), 1000, RGBColor()) ;
 	Geometry::Material * redEmissive = new Geometry::Material(RGBColor(), RGBColor(1.0f,0.0,0.0), RGBColor(0.0,0.0,0.0), 20.0f, RGBColor(10.0,0,0)) ; //emissive
-	Geometry::Material * redMat = new Geometry::Material(RGBColor(), RGBColor(1, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
+	Geometry::Material * redMat = new Geometry::Material(RGBColor(), RGBColor(1.0, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
 	Geometry::Material * greenMat = new Geometry::Material(RGBColor(), RGBColor(0.0, 1.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
 	Geometry::Material * blueMat = new Geometry::Material(RGBColor(), RGBColor(0.0, 0.0, 1.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
 
@@ -122,11 +122,11 @@ void initDiffuse(Geometry::Scene & scene)
 	geo.scaleZ(10) ;
 	scene.add(geo) ;
 
-	Geometry::Cube tmp(redMat) ;
+	Geometry::Cube tmp(blueMat) ;
 	tmp.translate(Math::makeVector(1.5,-1.5,0.0)) ;
 	scene.add(tmp) ;
 	
-	Geometry::Cube tmp2(redMat) ;
+	Geometry::Cube tmp2(blueMat) ;
 	tmp2.translate(Math::makeVector(2,1,-4)) ;
 	scene.add(tmp2) ;
 
@@ -140,29 +140,25 @@ void initDiffuse(Geometry::Scene & scene)
 		//scene.add(pointLight2);
 	}
 	{
-		//LightSurface
-		//Geometry::LightSource * surface1 = new Geometry::LightSurface(Math::makeVector(-1.0f, 3.0f, 4.90f), 3.0f, 0.5f);
-		//scene.add(surface1); 
-		
-		//scene.add(new Geometry::LightSurface(Math::makeVector(0, 0, 4), 2));
+		//Rectangle
+		Geometry::LightSurface * surface1 = new Geometry::LightSurface(Math::makeVector(0.0f, 0.0f, 4.5f), 2);
+		//scene.add(surface1);
 
+		//Disk
 		Geometry::LightSource * surface2 = new Geometry::LightDisk(Math::makeVector(1.0f, -3.0f, 4.50f), 1.0f, 50);
 		scene.add(surface2);
 
-		//Geometry::LightSource * surface3 = new Geometry::LightSphere(Math::makeVector(1.0f, -3.0f, 4.50f), 1.0f, 50);
+		//Sphere
+		Geometry::LightSource * surface3 = new Geometry::LightSphere(Math::makeVector(1.0f, 3.0f, 4.50f), 1.0f, 50);
 		//scene.add(surface3);
 	}
-
-
+	{
+		
+	}
 
 	{
 		Geometry::Camera camera(Math::makeVector(-4.0f, 0.0f, 0.0f), Math::makeVector(0.0f, 0.0f, 0.0f), 0.3f, 1.0f, 1.0f);
 		scene.setCamera(camera);
-	}
-	{
-		//SurfaceLight
-		Geometry::LightSurface * surfaceLight1 = new Geometry::LightSurface(Math::makeVector(0.0f, 0.0f, 4.5f),2);
-		scene.add(surfaceLight1);
 	}
 }
 
@@ -705,8 +701,8 @@ int main(int argc, char ** argv)
 	omp_set_num_threads(8);
 
 	// 1 - Initializes a window for rendering
-	Visualizer::Visualizer visu(1000,1000) ;
-	//Visualizer::Visualizer visu(500, 500);
+	//Visualizer::Visualizer visu(1000,1000) ;
+	Visualizer::Visualizer visu(500, 500);
 	//Visualizer::Visualizer visu(300,300) ;
 	
 	// 2 - Initializes the scene

@@ -39,7 +39,7 @@ namespace Geometry
 		::std::deque<::std::pair<BoundingBox, Geometry> > m_geometries ;
 		//Geometry m_geometry ;
 		/// \brief	The lights.
-		//std::vector<LightSource*> m_lights ;
+		std::vector<PointLight> m_lights ;
 		/// \brief	The camera.
 		Camera m_camera ;
 		/// \brief The scene bounding box
@@ -233,7 +233,7 @@ namespace Geometry
 			return I;
 		}
 
-		RGBColor phongDirect(CastedRay const &cray, PointLight generated_light, const Triangle * toIgnore) {
+		RGBColor phongDirect(CastedRay const &cray) {
 			RGBColor result(0.0, 0.0, 0.0);
 			
 			if (m_GI_surface) {
@@ -250,7 +250,7 @@ namespace Geometry
 					
 				PointLight light = res.first;
 				const Triangle * toIgnore(res.second);
-				if (!phongShadow(cray, light, toIgnore)) {
+				if (!phongShadow(cray, light)) {
 					//pas dans l'ombre donc on calcule
 					result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
 					}
@@ -258,7 +258,7 @@ namespace Geometry
 			}
 			else {
 				//On verifie pour chaque lumiere si celle si eclaire notre point d'intersection
-				for (const PointLight &light : m_lights) {
+				for (const PointLight & light : m_lights) {
 					if (!phongShadow(cray, light)) {
 						//pas dans l'ombre donc on calcule
 						result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
@@ -290,7 +290,7 @@ namespace Geometry
 			return i_diffuse;
 		}
 
-		bool phongShadow(CastedRay const &cray, PointLight const &light, const Triangle * toIgnore) {
+		bool phongShadow(CastedRay const &cray, PointLight const &light) {
 			//retourne true si dans l'ombre
 			bool shadow = false;
 			CastedRay cshadow(light.position(), cray.intersectionFound().intersection() - light.position());
