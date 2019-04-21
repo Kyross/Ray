@@ -168,6 +168,12 @@
     <ClInclude Include="..\src\Geometry\LightSurface.h">
       <Filter>src\Geometry</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Geometry\LightDisk.h">
+      <Filter>src\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Geometry\LightSphere.h">
+      <Filter>src\Geometry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">

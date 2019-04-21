@@ -118,9 +118,9 @@
     <ClInclude Include="..\src\Geometry\Geometry.h" />
     <ClInclude Include="..\src\Geometry\IntersecitonSet.h" />
     <ClInclude Include="..\src\Geometry\LightCache.h" />
+    <ClInclude Include="..\src\Geometry\LightDisk.h" />
     <ClInclude Include="..\src\Geometry\LightSampler.h" />
-    <ClInclude Include="..\src\Geometry\LightSource.h" />
-    <ClInclude Include="..\src\Geometry\LightSurface.h" />
+    <ClInclude Include="..\src\Geometry\LightSphere.h" />
     <ClInclude Include="..\src\Geometry\Loader3ds.h" />
     <ClInclude Include="..\src\Geometry\Material.h" />
     <ClInclude Include="..\src\Geometry\namespaceDoc.h" />
