@@ -20,9 +20,14 @@
 #include <Geometry/BoundingBox.h>
 #include <omp.h>
 #include <Geometry/BVH.h>
-#include <Geometry/LightSurface.h>
 #include <Geometry/LightSampler.h>
 #include <Geometry/LightSource.h>
+#include <Geometry/LightDisk.h>
+#include <Geometry/LightSurface.h>
+#include <Geometry/LightSphere.h>
+
+
+
 
 /// <summary>
 /// The directory of the 3D objetcs
@@ -136,10 +141,20 @@ void initDiffuse(Geometry::Scene & scene)
 	}
 	{
 		//LightSurface
-		Geometry::LightSource *surface1=new Geometry::LightSurface(Math::makeVector(0, 0, 4), 2);
-		scene.add(surface1);
+		//Geometry::LightSource * surface1 = new Geometry::LightSurface(Math::makeVector(-1.0f, 3.0f, 4.90f), 3.0f, 0.5f);
+		//scene.add(surface1); 
+		
 		//scene.add(new Geometry::LightSurface(Math::makeVector(0, 0, 4), 2));
+
+		Geometry::LightSource * surface2 = new Geometry::LightDisk(Math::makeVector(1.0f, -3.0f, 4.50f), 1.0f, 50);
+		scene.add(surface2);
+
+		//Geometry::LightSource * surface3 = new Geometry::LightSphere(Math::makeVector(1.0f, -3.0f, 4.50f), 1.0f, 50);
+		//scene.add(surface3);
 	}
+
+
+
 	{
 		Geometry::Camera camera(Math::makeVector(-4.0f, 0.0f, 0.0f), Math::makeVector(0.0f, 0.0f, 0.0f), 0.3f, 1.0f, 1.0f);
 		scene.setCamera(camera);
@@ -690,8 +705,8 @@ int main(int argc, char ** argv)
 	omp_set_num_threads(8);
 
 	// 1 - Initializes a window for rendering
-	//Visualizer::Visualizer visu(1000,1000) ;
-	Visualizer::Visualizer visu(500, 500);
+	Visualizer::Visualizer visu(1000,1000) ;
+	//Visualizer::Visualizer visu(500, 500);
 	//Visualizer::Visualizer visu(300,300) ;
 	
 	// 2 - Initializes the scene

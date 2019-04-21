@@ -48,19 +48,23 @@ namespace Geometry
 		size_t m_diffuseSamples ;
 		/// \brief Number of specular samples 
 		size_t m_specularSamples ;
-		/// \brief Number of light samples 
+		/// \brief Number of light samples (per light)
 		size_t m_lightSamples;
 		/// brief Rendering pass number
 		int m_pass;
 		/// <summary>
 		/// The light sampler associated with the scene
 		/// </summary>
+
 		//LightSampler m_lightSampler;
+		//Les sources de lumiere de la scene
 		::std::vector<LightSource*> m_lightSampler;
 		//La structure d'optimisation qui va permettre d'optimiser le calcul d'intersections
 		BVH *m_bvh;
 		bool m_GI_surface = true;
 		std::vector<LightSource*> m_lightSource;
+
+		//LightSurface m_SAMPLER;
 
 	public:
 
@@ -167,8 +171,9 @@ namespace Geometry
 		void add(LightSource *light)
 		{
 			m_lightSampler.push_back(light);
-			add(*light);
+			add(*light);			
 		}
+
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	void Scene::setCamera(Camera const & cam)
 		///
@@ -211,7 +216,7 @@ namespace Geometry
 			}
 			
 			//verification intersection
-			optim(cray,"");
+			optim(cray,"BVH", nullptr);
 
 
 			//Si intersection calcule selon le modele sinon background_color (noir) par defaut
@@ -232,13 +237,22 @@ namespace Geometry
 			RGBColor result(0.0, 0.0, 0.0);
 			
 			if (m_GI_surface) {
-				for (LightSource *source : m_lightSource) {
-					if (source->hasLights()) {
-						PointLight light = source->generate();
-						if (!phongShadow(cray, light)) {
-							//pas dans l'ombre donc on calcule
-							result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
-						}
+				for (const LightSource *source : m_lightSampler) {
+				
+				::std::vector< std::pair<PointLight, const Triangle *> > sampledLights;
+
+				for (int i = 0; i < m_lightSamples; i++) {
+					
+					sampledLights.push_back(source->generate());
+				}
+				
+				std::pair<PointLight, const Triangle * > res = source->generate();
+					
+				PointLight light = res.first;
+				const Triangle * toIgnore(res.second);
+				if (!phongShadow(cray, light, toIgnore)) {
+					//pas dans l'ombre donc on calcule
+					result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
 					}
 				}
 			}
@@ -367,14 +381,17 @@ namespace Geometry
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		void compute(int maxDepth, int subPixelDivision = 1, int passPerPixel = 1)
 		{
+			
 			buildBVH();
-			/*
 			// We prepare the light sampler (the sampler only stores triangles with a non null emissive component).
+			/*
 			for (auto it = m_geometries.begin(), end = m_geometries.end(); it != end; ++it)
 			{
 				//emissive a voir
 				//m_lightSampler.add(it->second);
-			}*/
+				m_SAMPLER.add(it->second);
+			}
+			*/
 
 			// Step on x and y for subpixel sampling
 			double step = 1.0f/subPixelDivision ;

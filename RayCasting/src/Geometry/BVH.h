@@ -71,7 +71,7 @@ namespace Geometry {
 			delete m_root;
 		}
 
-		void path(CastedRay &cray, const Triangle * toIgnore = nullptr) {
+		void path(CastedRay &cray, const Triangle * & toIgnore) {
 			double t0 = 0.0;
 			double t1 = 100000.0;
 			double entry, exit;
@@ -83,12 +83,13 @@ namespace Geometry {
 		}
 
 	protected:
-		void checkNode(BVHNode *current, CastedRay &cray, double t0, double t1, const Triangle * toIgnore = nullptr) {
+		void checkNode(BVHNode *current, CastedRay &cray, double t0, double t1, const Triangle * & toIgnore) {
 			double  l_entry, l_exit, r_entry, r_exit;
 			if (current->isLeaf()) {
 				for (const Triangle * t : current->m_primitives) {
 					//Bug des ombres
-					if(t != toIgnore) cray.intersect(t);
+					//if(t != toIgnore) 
+						cray.intersect(t);
 				}
 			}
 			else {
@@ -187,7 +188,7 @@ namespace Geometry {
 			double dy = bbox.max()[1] - bbox.min()[1];
 			double dz = bbox.max()[2] - bbox.min()[2];
 		
-			return 2 * (dx * dy + dx * dz + dy * dz);
+			return 2.0 * (dx * dy + dx * dz + dy * dz);
 		}
 	};
 }
