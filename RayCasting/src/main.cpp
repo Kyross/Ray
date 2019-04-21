@@ -146,11 +146,11 @@ void initDiffuse(Geometry::Scene & scene)
 
 		//Disk
 		Geometry::LightSource * surface2 = new Geometry::LightDisk(Math::makeVector(1.0f, -3.0f, 4.50f), 1.0f, 50);
-		scene.add(surface2);
+		//scene.add(surface2);
 
 		//Sphere
 		Geometry::LightSource * surface3 = new Geometry::LightSphere(Math::makeVector(1.0f, 3.0f, 4.50f), 1.0f, 50);
-		//scene.add(surface3);
+		scene.add(surface3);
 	}
 	{
 		
@@ -709,8 +709,8 @@ int main(int argc, char ** argv)
 	omp_set_num_threads(8);
 
 	// 1 - Initializes a window for rendering
-	Visualizer::Visualizer visu(1000,1000) ;
-	//Visualizer::Visualizer visu(500, 500);
+	//Visualizer::Visualizer visu(1000,1000) ;
+	Visualizer::Visualizer visu(500, 500);
 	//Visualizer::Visualizer visu(300,300) ;
 	
 	// 2 - Initializes the scene
