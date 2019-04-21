@@ -1,7 +1,6 @@
 #ifndef _Geometry_LightSurface_H
 #define _Geometry_LightSurface_H
 
-#include <Geometry/Geometry.h>
 #include <Geometry/LightSource.h>
 
 namespace Geometry
@@ -10,9 +9,10 @@ namespace Geometry
 	{
 	public:
 
-		LightSurface(Math::Vector3f position,double height=1,double witdh=1, Material * ematerial= new Material(0, 0, 0, 0, { 1,1,1 }))
+		LightSurface(Math::Vector3f position,double height=1,double witdh=1, Material * ematerial = nullptr)
 			: LightSource(position)
 		{
+			ematerial = new Material(0, 0, 0, 0, { 1,1,1 });
 			int p0 = addVertex(Math::makeVector(0.5, 0.5, 0.0));
 			int p1 = addVertex(Math::makeVector(0.5, -0.5, 0.0));
 			int p2 = addVertex(Math::makeVector(-0.5, 0.5, 0.0));
@@ -23,10 +23,9 @@ namespace Geometry
 			this->scaleY(height);
 			this->translate(m_position);
 
-			for (const Triangle &t : getTriangles()) {
-				add(t);
-			}
-			
+			auto & triangles = getTriangles();
+			add(triangles.begin(), triangles.end());
+
 		}
 
 		// Hérité via SourceLight

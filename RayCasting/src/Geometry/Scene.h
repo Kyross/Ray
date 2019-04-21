@@ -17,6 +17,7 @@
 #include <Geometry/LightSampler.h>
 #include <Geometry/BVH.h>
 #include <Geometry/LightSource.h>
+
 namespace Geometry
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,17 +48,21 @@ namespace Geometry
 		size_t m_diffuseSamples ;
 		/// \brief Number of specular samples 
 		size_t m_specularSamples ;
-		/// \brief Number of light samples 
+		/// \brief Number of light samples (per light)
 		size_t m_lightSamples;
 		/// brief Rendering pass number
 		int m_pass;
 		/// <summary>
 		/// The light sampler associated with the scene
 		/// </summary>
+
 		//LightSampler m_lightSampler;
+		//Les sources de lumiere de la scene
 		::std::vector<LightSource*> m_lightSampler;
 		//La structure d'optimisation qui va permettre d'optimiser le calcul d'intersections
 		BVH *m_bvh;
+
+		//LightSurface m_SAMPLER;
 
 	public:
 
@@ -164,8 +169,9 @@ namespace Geometry
 		void add(LightSource *light)
 		{
 			m_lightSampler.push_back(light);
-			add(*light);
+			add(*light);			
 		}
+
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	void Scene::setCamera(Camera const & cam)
 		///
@@ -208,7 +214,7 @@ namespace Geometry
 			}
 			
 			//verification intersection
-			optim(cray,"");
+			optim(cray,"BVH", nullptr);
 
 
 			//Si intersection calcule selon le modele sinon background_color (noir) par defaut
@@ -249,17 +255,20 @@ namespace Geometry
 			
 			for (const LightSource *source : m_lightSampler) {
 				
-				if (source->hasLights()) {
+				::std::vector< std::pair<PointLight, const Triangle *> > sampledLights;
 
-					std::pair<PointLight, const Triangle * > res = source->generate();
+				for (int i = 0; i < m_lightSamples; i++) {
 					
-					PointLight light = res.first;
-					const Triangle * toIgnore(res.second);
-
-					if (!phongShadow(cray, light, toIgnore)) {
-						//pas dans l'ombre donc on calcule
-						result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
-					}
+					sampledLights.push_back(source->generate());
+				}
+				
+				std::pair<PointLight, const Triangle * > res = source->generate();
+					
+				PointLight light = res.first;
+				const Triangle * toIgnore(res.second);
+				if (!phongShadow(cray, light, toIgnore)) {
+					//pas dans l'ombre donc on calcule
+					result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
 				}
 			}
 			//////
@@ -307,15 +316,15 @@ namespace Geometry
 			Math::Vector3f to_light = light.position() - cray.intersectionFound().intersection();
 
 			CastedRay cshadow(cray.intersectionFound().intersection(), to_light.normalized());
-			optim(cshadow,"");
+			optim(cshadow,"BVH", toIgnore);
 			if (cshadow.validIntersectionFound()) {
 				//Vecteur de l'intersection vers l'intersection du rayon shadow on regarde si l'intersection et avant la light
 				Math::Vector3f vecteur_int_shadow = cray.intersectionFound().intersection() - cshadow.intersectionFound().intersection();
 				Math::Vector3f vecteur_light = cray.intersectionFound().intersection() - light.position();
 				
 				//std::cout << "ToIgnore : " << toIgnore << " | Intersected : "<< cshadow.intersectionFound().triangle() <<std::endl;
-
-				/* MARCHE PAS FUCK
+				/* MARCHE PAS FUCK */
+				/*
 				if (cshadow.intersectionFound().triangle() == toIgnore) {
 					shadow = false;
 				}
@@ -323,7 +332,7 @@ namespace Geometry
 					shadow = true;
 				}
 				*/
-
+				
 				if (vecteur_int_shadow.norm() < vecteur_light.norm()) {
 					shadow = true;
 				}
@@ -411,14 +420,17 @@ namespace Geometry
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		void compute(int maxDepth, int subPixelDivision = 1, int passPerPixel = 1)
 		{
+			
 			buildBVH();
-			/*
 			// We prepare the light sampler (the sampler only stores triangles with a non null emissive component).
+			/*
 			for (auto it = m_geometries.begin(), end = m_geometries.end(); it != end; ++it)
 			{
 				//emissive a voir
 				//m_lightSampler.add(it->second);
-			}*/
+				m_SAMPLER.add(it->second);
+			}
+			*/
 
 			// Step on x and y for subpixel sampling
 			double step = 1.0f/subPixelDivision ;

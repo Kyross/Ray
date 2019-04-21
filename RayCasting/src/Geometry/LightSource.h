@@ -21,6 +21,7 @@ namespace Geometry
 		::std::vector<const Triangle * > allTriangles;
 		double currentSum;
 		Math::Vector3f m_position;
+		RGBColor m_color;
 
 	public:
 		/// <summary>
