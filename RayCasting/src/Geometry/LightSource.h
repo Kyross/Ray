@@ -36,7 +36,7 @@ namespace Geometry
 		/// Genates a point light by sampling the kept triangles.
 		/// </summary>
 		/// <returns></returns>
-		virtual std::pair<PointLight, const Triangle * > generate() const = 0 {}
+		virtual PointLight generate(double inf1 = 0.0, double sup1= 1.0, double inf2 = 0.0, double sup2 = 1.0) const = 0 {}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	const Math::Vector3 & PointLight::position() const

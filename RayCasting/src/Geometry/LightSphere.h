@@ -44,7 +44,7 @@ namespace Geometry
 		}
 
 		// Hérité via SourceLight
-		std::pair<PointLight, const Triangle * > generate() const
+		PointLight generate(double inf1 = 0.0, double sup1 = 1.0, double inf2 = 0.0, double sup2 = 1.0) const
 		{
 			double xi1 = double(randomGenerator()) / double(randomGenerator.max());
 			double xi2 = double(randomGenerator()) / double(randomGenerator.max());
@@ -60,9 +60,7 @@ namespace Geometry
 
 			PointLight light(pos, m_color);
 
-
-			std::pair<PointLight, const Triangle * > res(light, nullptr);
-			return res;
+			return light;
 
 		}
 

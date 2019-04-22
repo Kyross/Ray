@@ -43,7 +43,7 @@ namespace Geometry
 		}
 		
 		// Hérité via SourceLight
-		std::pair<PointLight, const Triangle * > generate() const
+		PointLight generate(double inf1 = 0.0, double sup1 = 1.0, double inf2 = 0.0, double sup2 = 1.0) const
 		{
 			/*
 			double random = double(randomGenerator()) / double(randomGenerator.max());
@@ -59,8 +59,13 @@ namespace Geometry
 			PointLight light(point, allTriangles[index]->material()->getEmissive()*color);
 			*/
 			
-			double xi1 = double(randomGenerator()) / double(randomGenerator.max());
-			double xi2 = double(randomGenerator()) / double(randomGenerator.max());
+			//double xi1 = double(randomGenerator()) / double(randomGenerator.max());
+			//double xi2 = double(randomGenerator()) / double(randomGenerator.max());
+
+			//Calcul d'un random entre inf et sup
+			double xi1 = fmod( double(randomGenerator()) / double(randomGenerator.max() ), double(sup1 - inf1)) + inf1;
+			double xi2 = fmod( double(randomGenerator()) / double(randomGenerator.max() ), double(sup2 - inf2)) + inf2;
+			//std::cout << xi1 << std::endl;
 
 			double phi = 2 * M_PI * xi1;
 			double r = m_radius * sqrt(xi2);
@@ -72,9 +77,7 @@ namespace Geometry
 			
 			PointLight light(pos, m_color);
 			
-
-			std::pair<PointLight, const Triangle * > res(light, nullptr);
-			return res;
+			return light;
 
 		}
 		

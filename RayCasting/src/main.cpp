@@ -146,16 +146,12 @@ void initDiffuse(Geometry::Scene & scene)
 
 		//Disk
 		Geometry::LightSource * surface2 = new Geometry::LightDisk(Math::makeVector(1.0f, -3.0f, 4.50f), 1.0f, 50);
-		//scene.add(surface2);
+		scene.add(surface2);
 
 		//Sphere
 		Geometry::LightSource * surface3 = new Geometry::LightSphere(Math::makeVector(1.0f, 3.0f, 4.50f), 1.0f, 50);
-		scene.add(surface3);
+		//scene.add(surface3);
 	}
-	{
-		
-	}
-
 	{
 		Geometry::Camera camera(Math::makeVector(-4.0f, 0.0f, 0.0f), Math::makeVector(0.0f, 0.0f, 0.0f), 0.3f, 1.0f, 1.0f);
 		scene.setCamera(camera);
@@ -751,7 +747,9 @@ int main(int argc, char ** argv)
 	//scene.setSpecularSamples(16);
 	//scene.setDiffuseSamples(4);
 	//scene.setSpecularSamples(4);
-	scene.setLightSamples(32);
+
+	//Nombre de samples pour chaque lumiere surfacique, doit etre un carré
+	scene.setLightSamples(4);
 	scene.compute(maxBounce, subPixelSampling, passPerPixel) ;
 
 	// 4 - waits until a key is pressed

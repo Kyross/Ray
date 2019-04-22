@@ -57,16 +57,15 @@ namespace Geometry
 		/// </summary>
 
 		//LightSampler m_lightSampler;
-		//Les sources de lumiere de la scene
+		//Les sources surfaciques de lumiere de la scene
 		::std::vector<LightSource*> m_lightSampler;
 		//La structure d'optimisation qui va permettre d'optimiser le calcul d'intersections
 		BVH *m_bvh;
+		//Activer ou desactiver l'illumination globale
 		bool m_GI_surface = true;
-		std::vector<LightSource*> m_lightSource;
+		//Activer ou desactiver la stratification
+		bool m_stratif = false;
 
-		//LightSurface m_SAMPLER;
-
-		//LightSurface m_SAMPLER;
 
 	public:
 
@@ -239,26 +238,51 @@ namespace Geometry
 		RGBColor phongDirect(CastedRay const &cray) {
 			RGBColor result(0.0, 0.0, 0.0);
 			
+			//Global Illumination
 			if (m_GI_surface) {
+
 				for (const LightSource *source : m_lightSampler) {
 				
-				::std::vector< std::pair<PointLight, const Triangle *> > sampledLights;
+					if(m_stratif){ //Avec stratif
+						::std::vector< PointLight > sampledLights;
+						double interval = 1.0 / sqrt(double(m_lightSamples));
+						for (double i = 0.0 ; i < 1.0; i += interval) {
 
-				for (int i = 0; i < m_lightSamples; i++) {
-					
-					sampledLights.push_back(source->generate());
-				}
-				
-				std::pair<PointLight, const Triangle * > res = source->generate();
-					
-				PointLight light = res.first;
-				const Triangle * toIgnore(res.second);
-				if (!phongShadow(cray, light)) {
-					//pas dans l'ombre donc on calcule
-					result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
+							double inf1 = i;
+							double sup1 = i + interval;
+
+							for (double j = 0.0 ; j < 1.0; j += interval) {
+								
+								double inf2 = j;
+								double sup2 = j + interval;
+								
+								//std::cout << "Interval 1 : " << inf1 << " - " << sup1 << std::endl;
+								//std::cout << "Interval 2 : " << inf2 << " - " << sup2 << std::endl;
+								
+								sampledLights.push_back(source->generate(inf1, sup1, inf2, sup2));
+							}
+						}
+
+						for (PointLight sample : sampledLights) {
+							if (!phongShadow(cray, sample)) {
+								//pas dans l'ombre donc on calcule
+								result = result + (phongDiffuse(cray, sample) + phongSpecular(cray, sample))*sample.color();
+							}
+						}
+
+					}
+
+					else{ //Sans stratif
+						PointLight light = source->generate();
+						if (!phongShadow(cray, light)) {
+							//pas dans l'ombre donc on calcule
+							result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
+							}
 					}
 				}
 			}
+
+			//Classic Raytracing
 			else {
 				//On verifie pour chaque lumiere si celle si eclaire notre point d'intersection
 				for (const PointLight & light : m_lights) {
@@ -421,7 +445,7 @@ namespace Geometry
 						::std::cout << "Pass: " << m_pass << "/" << passPerPixel * subPixelDivision * subPixelDivision << ::std::endl;
 						++m_pass;
 						// Sends primary rays for each pixel (uncomment the pragma to parallelize rendering)
-#pragma omp parallel for schedule(dynamic)//, 10)//guided)//dynamic)
+//#pragma omp parallel for schedule(dynamic)//, 10)//guided)//dynamic)
 						for (int y = 0; y < m_visu->height(); y++)
 						{
 							for (int x = 0; x < m_visu->width(); x++)

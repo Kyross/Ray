@@ -29,7 +29,7 @@ namespace Geometry
 		}
 
 		// Hérité via SourceLight
-		std::pair<PointLight, const Triangle * > generate() const
+		PointLight generate(double inf1 = 0.0, double sup1 = 1.0, double inf2 = 0.0, double sup2 = 1.0) const
 		{
 			double random = double(randomGenerator()) / double(randomGenerator.max());
 			random = random * currentSum;
@@ -42,8 +42,7 @@ namespace Geometry
 			const Triangle * toIgnore = allTriangles[index];
 			PointLight light(point, allTriangles[index]->material()->getEmissive()*color);
 
-			std::pair<PointLight, const Triangle * > res(light, toIgnore);
-			return res;
+			return light;
 		}
 	};
 }
