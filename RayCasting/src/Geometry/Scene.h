@@ -57,16 +57,15 @@ namespace Geometry
 		/// </summary>
 
 		//LightSampler m_lightSampler;
-		//Les sources de lumiere de la scene
+		//Les sources surfaciques de lumiere de la scene
 		::std::vector<LightSource*> m_lightSampler;
 		//La structure d'optimisation qui va permettre d'optimiser le calcul d'intersections
 		BVH *m_bvh;
+		//Activer ou desactiver l'illumination globale
 		bool m_GI_surface = true;
-		std::vector<LightSource*> m_lightSource;
+		//Activer ou desactiver la stratification
+		bool m_stratif = true;
 
-		//LightSurface m_SAMPLER;
-
-		//LightSurface m_SAMPLER;
 
 	public:
 
@@ -227,7 +226,7 @@ namespace Geometry
 				RGBColor ia = cray.intersectionFound().triangle()->material()->getAmbient();
 
 				//On ne prend pas en compte ia dans les calculs car elle fausse le r�sultat pour (au moins) sombrero et robot
-				I = ie + phongDirect(cray) + reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
+				I = ie + phongDirect(cray) +reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
 				//texture
 				RGBColor stexture = cray.intersectionFound().triangle()->sampleTexture(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue());
 				I = I * stexture;
@@ -239,26 +238,53 @@ namespace Geometry
 		RGBColor phongDirect(CastedRay const &cray) {
 			RGBColor result(0.0, 0.0, 0.0);
 			
+			//Global Illumination
 			if (m_GI_surface) {
-				for (const LightSource *source : m_lightSampler) {
-				
-				::std::vector< std::pair<PointLight, const Triangle *> > sampledLights;
 
-				for (int i = 0; i < m_lightSamples; i++) {
-					
-					sampledLights.push_back(source->generate());
-				}
+				for (LightSource * source : m_lightSampler) {
 				
-				std::pair<PointLight, const Triangle * > res = source->generate();
-					
-				PointLight light = res.first;
-				const Triangle * toIgnore(res.second);
-				if (!phongShadow(cray, light)) {
-					//pas dans l'ombre donc on calcule
-					result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
+					if(m_stratif){ //Avec stratif
+						::std::vector< PointLight > sampledLights;
+						/*
+						double interval = 1.0 / sqrt(double(m_lightSamples));
+						for (double i = 0.0 ; i < 1.0; i += interval) {
+
+							double inf1 = i;
+							double sup1 = i + interval;
+
+							for (double j = 0.0 ; j < 1.0; j += interval) {
+								
+								double inf2 = j;
+								double sup2 = j + interval;
+								
+								//std::cout << "Interval 1 : " << inf1 << " - " << sup1 << std::endl;
+								//std::cout << "Interval 2 : " << inf2 << " - " << sup2 << std::endl;
+								
+								sampledLights.push_back(source->generate(inf1, sup1, inf2, sup2));
+							}
+						}*/
+						
+						PointLight sample = source->generate();
+						//for (PointLight sample : sampledLights) {
+							if (!phongShadow(cray, sample)) {
+								//pas dans l'ombre donc on calcule
+								result = result + (phongDiffuse(cray, sample) + phongSpecular(cray, sample))*sample.color();
+							}
+						//}
+
+					}
+
+					else{ //Sans stratif
+						PointLight light = source->generate();
+						if (!phongShadow(cray, light)) {
+							//pas dans l'ombre donc on calcule
+							result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
+							}
 					}
 				}
 			}
+
+			//Classic Raytracing
 			else {
 				//On verifie pour chaque lumiere si celle si eclaire notre point d'intersection
 				for (const PointLight & light : m_lights) {
@@ -430,6 +456,7 @@ namespace Geometry
 								m_visu->plot(x, y, RGBColor(1000.0, 0.0, 0.0));
 								// Ray casting
 								RGBColor result = sendRay(m_camera.getRay(((double)x + xp) / m_visu->width(), ((double)y + yp) / m_visu->height()), 0, maxDepth, m_diffuseSamples, m_specularSamples);
+								
 								// Accumulation of ray casting result in the associated pixel
 								::std::pair<int, RGBColor> & currentPixel = pixelTable[x][y];
 								currentPixel.first++;

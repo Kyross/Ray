@@ -13,23 +13,19 @@ namespace Geometry
 	{
 	protected:
 		double m_radius;
-		RGBColor m_color;
+		//RGBColor m_color;
 	public:
 
-		LightSphere(Math::Vector3f position, double radius = 1, int nbDiv = 10, Material * ematerial = nullptr)
-			: LightSource(position), m_radius(radius)
+		LightSphere(Math::Vector3f position, double radius = 1, int nbDiv = 10, Material * ematerial = nullptr, int lightSamples = 1)
+			: LightSource(position, lightSamples, ematerial), m_radius(radius)
 		{
-			
-			ematerial = new Material(0, 0, 0, 0, { 1,1,1 });
 
-			m_color = ematerial->getEmissive();
-			/*
 			unsigned int center = addVertex(Math::Vector3f());
 			::std::vector<unsigned int> vertices;
 			for (int cpt = 0; cpt < nbDiv; cpt++)
 			{
 				double angle = double((2.0f*M_PI / nbDiv)*cpt);
-				int i = addVertex(Math::makeVector(m_radius * cos(angle), m_radius * sin(angle), 0.0));
+				int i = addVertex(Math::makeVector(0.1 * cos(angle), 0.1 * sin(angle), 0.0));
 				vertices.push_back(i);
 			}
 			for (int cpt = 0; cpt < nbDiv; cpt++)
@@ -40,14 +36,22 @@ namespace Geometry
 
 			auto & triangles = getTriangles();
 			add(triangles.begin(), triangles.end());
-			*/
 		}
 
 		// Hérité via SourceLight
-		std::pair<PointLight, const Triangle * > generate() const
+		PointLight generate()
 		{
-			double xi1 = double(randomGenerator()) / double(randomGenerator.max());
-			double xi2 = double(randomGenerator()) / double(randomGenerator.max());
+			//double xi1 = double(randomGenerator()) / double(randomGenerator.max());
+			//double xi2 = double(randomGenerator()) / double(randomGenerator.max());
+
+			double inf1 = m_computedIntervals[m_compteurStratif].first.first;
+			double sup1 = m_computedIntervals[m_compteurStratif].first.second;
+			double inf2 = m_computedIntervals[m_compteurStratif].second.first;
+			double sup2 = m_computedIntervals[m_compteurStratif].second.second;
+
+			//Calcul d'un random entre inf et sup
+			double xi1 = fmod(double(randomGenerator()) / double(randomGenerator.max()), double(sup1 - inf1)) + inf1;
+			double xi2 = fmod(double(randomGenerator()) / double(randomGenerator.max()), double(sup2 - inf2)) + inf2;
 
 			double theta = acos(sqrt(xi1));
 			double phi = 2 * M_PI * xi2;
@@ -60,9 +64,8 @@ namespace Geometry
 
 			PointLight light(pos, m_color);
 
-
-			std::pair<PointLight, const Triangle * > res(light, nullptr);
-			return res;
+			m_compteurStratif = (m_compteurStratif + 1) % m_lightSamples;
+			return light;
 
 		}
 
