@@ -25,6 +25,7 @@
 #include <Geometry/LightDisk.h>
 #include <Geometry/LightSurface.h>
 #include <Geometry/LightSphere.h>
+#include <Geometry/LightRectangle.h>
 
 
 
@@ -123,11 +124,13 @@ void initDiffuse(Geometry::Scene & scene)
 	scene.add(geo) ;
 
 	Geometry::Cube tmp(blueMat) ;
-	tmp.translate(Math::makeVector(1.5,-1.5,0.0)) ;
+	tmp.translate(Math::makeVector(1.0f, 3.0f, -4.0f));
+	//tmp.translate(Math::makeVector(1.5,-1.5,0.0)) ;
 	scene.add(tmp) ;
 	
 	Geometry::Cube tmp2(blueMat) ;
-	tmp2.translate(Math::makeVector(2,1,-4)) ;
+	tmp2.translate(Math::makeVector(1.0f, -3.0f, -4.0f));
+	//tmp2.translate(Math::makeVector(2,1,-4)) ;
 	scene.add(tmp2) ;
 
 	// 2.2 Adds point lights in the scene 
@@ -139,18 +142,26 @@ void initDiffuse(Geometry::Scene & scene)
 		Geometry::PointLight pointLight2(Math::makeVector(4.f, 0.f, 0.f), RGBColor(0.5f, 0.5f, 0.5f));
 		//scene.add(pointLight2);
 	}
+	Geometry::Material * ematerial1 = new Geometry::Material(0, 0, 0, 0, { 1,1,1 });
+	Geometry::Material * ematerial2 = new Geometry::Material(0, 0, 0, 0, { 0.1, 1, 1 });
+	Math::Quaternion<double> defaultRota(Math::makeVector(0.0, 0.0, 0.0), 0.0);
+	Math::Quaternion<double> q(Math::makeVector(-1.0,1.0,0.0),1.0);
 	{
-		//Rectangle
-		Geometry::LightSurface * surface1 = new Geometry::LightSurface(Math::makeVector(0.0f, 0.0f, 4.5f), 2);
+		//Rectangle du prof
+		Geometry::LightSource * surface1 = new Geometry::LightSurface(Math::makeVector(1.0f, 3.0f, 4.5f), q, 1.0,1.0, ematerial1, 25);
 		//scene.add(surface1);
 
 		//Disk
-		Geometry::LightSource * surface2 = new Geometry::LightDisk(Math::makeVector(1.0f, -3.0f, 4.50f), 1.0f, 50);
+		Geometry::LightSource * surface2 = new Geometry::LightDisk(Math::makeVector(1.0f, -3.0f, 2.50f), q, 1.5f, 50, ematerial2, 25);
 		scene.add(surface2);
 
 		//Sphere
-		Geometry::LightSource * surface3 = new Geometry::LightSphere(Math::makeVector(1.0f, 3.0f, 4.50f), 1.0f, 50);
+		Geometry::LightSource * surface3 = new Geometry::LightSphere(Math::makeVector(1.0f, 3.0f, 4.50f), 1.0f, 50, ematerial1, 25);
 		//scene.add(surface3);
+
+		//Rectangle
+		Geometry::LightSource * surface4 = new Geometry::LightRectangle(Math::makeVector(0.0f, 0.0f, 4.0f), defaultRota, 1.0 ,1.0, ematerial1, 25);
+		//scene.add(surface4);
 	}
 	{
 		Geometry::Camera camera(Math::makeVector(-4.0f, 0.0f, 0.0f), Math::makeVector(0.0f, 0.0f, 0.0f), 0.3f, 1.0f, 1.0f);
@@ -748,8 +759,7 @@ int main(int argc, char ** argv)
 	//scene.setDiffuseSamples(4);
 	//scene.setSpecularSamples(4);
 
-	//Nombre de samples pour chaque lumiere surfacique, doit etre un carré
-	scene.setLightSamples(4);
+	
 	scene.compute(maxBounce, subPixelSampling, passPerPixel) ;
 
 	// 4 - waits until a key is pressed

@@ -22,21 +22,42 @@ namespace Geometry
 		double currentSum;
 		Math::Vector3f m_position;
 		RGBColor m_color;
+		::std::vector< std::pair< std::pair<double, double>, std::pair<double, double> > > m_computedIntervals; //Intervalles pour la stratification
+		int m_compteurStratif;
+		int m_lightSamples;
 
 	public:
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		LightSource(Math::Vector3f position)
-			: m_position(position),currentSum(0.0), Geometry()
-		{}
+		LightSource(Math::Vector3f position, int lightSamples, Material * ematerial)
+			: m_position(position),currentSum(0.0), m_compteurStratif(0), m_lightSamples(lightSamples), Geometry()
+		{
+			m_color = ematerial->getEmissive();
+			//Creation des intervalles pour la stratification, de la forme paire( paire(a,b) , paire(c,d) ) 
+			double interval = 1.0 / sqrt(double(m_lightSamples));
+			for (double i = 0.0; i < 1.0; i += interval) {
+
+				std::pair<double, double > interval1(i, i + interval);
+
+				for (double j = 0.0; j <= 1.0-interval; j += interval) {
+
+					std::pair<double, double > interval2(j, j + interval);
+
+					std::pair< std::pair<double, double>, std::pair<double, double> > currentInterval(interval1, interval2);
+					m_computedIntervals.push_back(currentInterval);
+				}
+			}	
+		}
 		
 
 		/// <summary>
 		/// Genates a point light by sampling the kept triangles.
 		/// </summary>
 		/// <returns></returns>
-		virtual PointLight generate(double inf1 = 0.0, double sup1= 1.0, double inf2 = 0.0, double sup2 = 1.0) const = 0 {}
+		virtual PointLight generate() = 0 {}
+
+		
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	const Math::Vector3 & PointLight::position() const

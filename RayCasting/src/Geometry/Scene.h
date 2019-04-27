@@ -64,7 +64,7 @@ namespace Geometry
 		//Activer ou desactiver l'illumination globale
 		bool m_GI_surface = true;
 		//Activer ou desactiver la stratification
-		bool m_stratif = false;
+		bool m_stratif = true;
 
 
 	public:
@@ -226,7 +226,7 @@ namespace Geometry
 				RGBColor ia = cray.intersectionFound().triangle()->material()->getAmbient();
 
 				//On ne prend pas en compte ia dans les calculs car elle fausse le r�sultat pour (au moins) sombrero et robot
-				I = ie + phongDirect(cray) + reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
+				I = ie + phongDirect(cray) +reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
 				//texture
 				RGBColor stexture = cray.intersectionFound().triangle()->sampleTexture(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue());
 				I = I * stexture;
@@ -241,10 +241,11 @@ namespace Geometry
 			//Global Illumination
 			if (m_GI_surface) {
 
-				for (const LightSource *source : m_lightSampler) {
+				for (LightSource * source : m_lightSampler) {
 				
 					if(m_stratif){ //Avec stratif
 						::std::vector< PointLight > sampledLights;
+						/*
 						double interval = 1.0 / sqrt(double(m_lightSamples));
 						for (double i = 0.0 ; i < 1.0; i += interval) {
 
@@ -261,14 +262,15 @@ namespace Geometry
 								
 								sampledLights.push_back(source->generate(inf1, sup1, inf2, sup2));
 							}
-						}
-
-						for (PointLight sample : sampledLights) {
+						}*/
+						
+						PointLight sample = source->generate();
+						//for (PointLight sample : sampledLights) {
 							if (!phongShadow(cray, sample)) {
 								//pas dans l'ombre donc on calcule
 								result = result + (phongDiffuse(cray, sample) + phongSpecular(cray, sample))*sample.color();
 							}
-						}
+						//}
 
 					}
 
@@ -445,7 +447,7 @@ namespace Geometry
 						::std::cout << "Pass: " << m_pass << "/" << passPerPixel * subPixelDivision * subPixelDivision << ::std::endl;
 						++m_pass;
 						// Sends primary rays for each pixel (uncomment the pragma to parallelize rendering)
-//#pragma omp parallel for schedule(dynamic)//, 10)//guided)//dynamic)
+#pragma omp parallel for schedule(dynamic)//, 10)//guided)//dynamic)
 						for (int y = 0; y < m_visu->height(); y++)
 						{
 							for (int x = 0; x < m_visu->width(); x++)
@@ -454,6 +456,7 @@ namespace Geometry
 								m_visu->plot(x, y, RGBColor(1000.0, 0.0, 0.0));
 								// Ray casting
 								RGBColor result = sendRay(m_camera.getRay(((double)x + xp) / m_visu->width(), ((double)y + yp) / m_visu->height()), 0, maxDepth, m_diffuseSamples, m_specularSamples);
+								
 								// Accumulation of ray casting result in the associated pixel
 								::std::pair<int, RGBColor> & currentPixel = pixelTable[x][y];
 								currentPixel.first++;

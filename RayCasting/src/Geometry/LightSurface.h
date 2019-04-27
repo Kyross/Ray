@@ -9,27 +9,26 @@ namespace Geometry
 	{
 	public:
 
-		LightSurface(Math::Vector3f position, double height = 1, double witdh = 1, Material * ematerial = nullptr)
-			: LightSource(position)
+		LightSurface(Math::Vector3f position, Math::Quaternion<double> const & q, double height = 1, double width = 1, Material * ematerial = nullptr, int lightSamples = 1)
+			: LightSource(position, lightSamples, ematerial)
 		{
-			ematerial = new Material(0, 0, 0, 0, { 1,1,1 });
 			int p0 = addVertex(Math::makeVector(0.5, 0.5, 0.0));
 			int p1 = addVertex(Math::makeVector(0.5, -0.5, 0.0));
 			int p2 = addVertex(Math::makeVector(-0.5, 0.5, 0.0));
 			int p3 = addVertex(Math::makeVector(-0.5, -0.5, 0.0));
 			addTriangle(p0, p1, p2, ematerial);
 			addTriangle(p1, p2, p3, ematerial);
-			this->scaleX(witdh);
+			this->scaleX(width);
 			this->scaleY(height);
 			this->translate(m_position);
+			this->rotate(q);
 
 			auto & triangles = getTriangles();
 			add(triangles.begin(), triangles.end());
-
 		}
 
 		// Hérité via SourceLight
-		PointLight generate(double inf1 = 0.0, double sup1 = 1.0, double inf2 = 0.0, double sup2 = 1.0) const
+		PointLight generate()
 		{
 			double random = double(randomGenerator()) / double(randomGenerator.max());
 			random = random * currentSum;
@@ -39,9 +38,9 @@ namespace Geometry
 			Math::Vector3f point = allTriangles[index]->pointFromBraycentric(barycentric);
 			RGBColor color = allTriangles[index]->sampleTexture(barycentric);
 
-			const Triangle * toIgnore = allTriangles[index];
 			PointLight light(point, allTriangles[index]->material()->getEmissive()*color);
 
+			m_compteurStratif = (m_compteurStratif + 1) % m_lightSamples;
 			return light;
 		}
 	};

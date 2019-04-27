@@ -14,16 +14,12 @@ namespace Geometry
 	{
 	protected:
 		double m_radius;
-		RGBColor m_color;
+		//RGBColor m_color;
 	public:
 		
-		LightDisk(Math::Vector3f position, double radius = 1, int nbDiv = 10, Material * ematerial = nullptr)
-			: LightSource(position), m_radius(radius)
+		LightDisk(Math::Vector3f position, Math::Quaternion<double> const & q, double radius = 1, int nbDiv = 10, Material * ematerial = nullptr, int lightSamples = 1)
+			: LightSource(position, lightSamples, ematerial), m_radius(radius)
 		{
-			ematerial = new Material(0, 0, 0, 0, { 1,1,1 });
-			
-			m_color = ematerial->getEmissive();
-
 			unsigned int center = addVertex(Math::Vector3f());
 			::std::vector<unsigned int> vertices;
 			for (int cpt = 0; cpt < nbDiv; cpt++)
@@ -37,35 +33,35 @@ namespace Geometry
 				addTriangle(center, vertices[cpt], vertices[(cpt + 1) % nbDiv], ematerial);
 			}
 			this->translate(m_position);
+			this->rotate(q);
 
 			auto & triangles = getTriangles();
 			add(triangles.begin(), triangles.end());
 		}
 		
 		// Hérité via SourceLight
-		PointLight generate(double inf1 = 0.0, double sup1 = 1.0, double inf2 = 0.0, double sup2 = 1.0) const
+		PointLight generate()
 		{
-			/*
-			double random = double(randomGenerator()) / double(randomGenerator.max());
-			random = random * currentSum;
-			auto found = std::lower_bound(surfaceSum.begin(), surfaceSum.end(), random);
-			size_t index = found - surfaceSum.begin();
-			Math::Vector3f barycentric = allTriangles[index]->randomBarycentric();
-			Math::Vector3f point = allTriangles[index]->pointFromBraycentric(barycentric);
-			
-			RGBColor color = allTriangles[index]->sampleTexture(barycentric);
-
-			const Triangle * toIgnore = allTriangles[index];
-			PointLight light(point, allTriangles[index]->material()->getEmissive()*color);
-			*/
-			
 			//double xi1 = double(randomGenerator()) / double(randomGenerator.max());
 			//double xi2 = double(randomGenerator()) / double(randomGenerator.max());
 
+			double inf1 = m_computedIntervals[m_compteurStratif].first.first;
+			double sup1 = m_computedIntervals[m_compteurStratif].first.second;
+			double inf2 = m_computedIntervals[m_compteurStratif].second.first;
+			double sup2 = m_computedIntervals[m_compteurStratif].second.second;
+			/*
+			std::cout << "Inf1 : " << inf1 << " - ";
+			std::cout << "Sup1 : " << sup1 << " - ";
+			std::cout << "Inf2 : " << inf2 << " - ";
+			std::cout << "Sup2 : " << sup2 << std::endl;
+			*/
 			//Calcul d'un random entre inf et sup
 			double xi1 = fmod( double(randomGenerator()) / double(randomGenerator.max() ), double(sup1 - inf1)) + inf1;
 			double xi2 = fmod( double(randomGenerator()) / double(randomGenerator.max() ), double(sup2 - inf2)) + inf2;
 			//std::cout << xi1 << std::endl;
+
+			//xi1 = (inf1 + sup1) / 2.0;
+			//xi2 = (inf2 + sup2) / 2.0;
 
 			double phi = 2 * M_PI * xi1;
 			double r = m_radius * sqrt(xi2);
@@ -77,6 +73,7 @@ namespace Geometry
 			
 			PointLight light(pos, m_color);
 			
+			m_compteurStratif = (m_compteurStratif + 1) % m_lightSamples;
 			return light;
 
 		}
