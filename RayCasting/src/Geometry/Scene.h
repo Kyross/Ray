@@ -64,21 +64,11 @@ namespace Geometry
 		BVH *m_bvh;
 		//Activer ou desactiver l'illumination globale
 		bool m_GI_surface = true;
-		//Activer ou desactiver la stratification
-		bool m_stratif = true;
 		//Activer ou desactiver l'echantillonnage a graine unique
 		bool m_graineUnique = true;
 
 
 	public:
-
-		////Echantillonage a graine unique
-		void setSeeds(int newSeed) {
-			for (LightSource * source : m_lightSampler) {
-				source->setSeed(newSeed);
-			}
-		}
-
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	Scene::Scene(Visualizer::Visualizer * visu)
@@ -254,44 +244,12 @@ namespace Geometry
 
 				for (LightSource * source : m_lightSampler) {
 				
-					if(m_stratif){ //Avec stratif
-						::std::vector< PointLight > sampledLights;
-						/*
-						double interval = 1.0 / sqrt(double(m_lightSamples));
-						for (double i = 0.0 ; i < 1.0; i += interval) {
-
-							double inf1 = i;
-							double sup1 = i + interval;
-
-							for (double j = 0.0 ; j < 1.0; j += interval) {
-								
-								double inf2 = j;
-								double sup2 = j + interval;
-								
-								//std::cout << "Interval 1 : " << inf1 << " - " << sup1 << std::endl;
-								//std::cout << "Interval 2 : " << inf2 << " - " << sup2 << std::endl;
-								
-								sampledLights.push_back(source->generate(inf1, sup1, inf2, sup2));
-							}
-						}*/
-						
-						PointLight sample = source->generate();
-						//for (PointLight sample : sampledLights) {
-							if (!phongShadow(cray, sample)) {
-								//pas dans l'ombre donc on calcule
-								result = result + (phongDiffuse(cray, sample) + phongSpecular(cray, sample))*sample.color();
-							}
-						//}
-
-					}
-
-					else{ //Sans stratif
-						PointLight light = source->generate();
-						if (!phongShadow(cray, light)) {
-							//pas dans l'ombre donc on calcule
-							result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
-							}
-					}
+					PointLight light = source->generate();
+					if (!phongShadow(cray, light)) {
+						//pas dans l'ombre donc on calcule
+						result = result + (phongDiffuse(cray, light) + phongSpecular(cray, light))*light.color();
+						}
+					
 				}
 			}
 
@@ -455,9 +413,8 @@ namespace Geometry
 				{
 					for (double yp = -0.5; yp < 0.5; yp += step)
 					{
-						if (m_graineUnique) {
-							setSeeds(time(0));
-						}
+						int newSeed = std::rand();
+
 						::std::cout << "Pass: " << m_pass << "/" << passPerPixel * subPixelDivision * subPixelDivision << ::std::endl;
 						++m_pass;
 						// Sends primary rays for each pixel (uncomment the pragma to parallelize rendering)
@@ -468,6 +425,8 @@ namespace Geometry
 							{
 #pragma omp critical (visu)
 								m_visu->plot(x, y, RGBColor(1000.0, 0.0, 0.0));
+								//Echantillonnage
+								if (m_graineUnique) std::srand(newSeed);
 								// Ray casting
 								RGBColor result = sendRay(m_camera.getRay(((double)x + xp) / m_visu->width(), ((double)y + yp) / m_visu->height()), 0, maxDepth, m_diffuseSamples, m_specularSamples);
 								

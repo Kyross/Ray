@@ -5,6 +5,7 @@
 #include <Geometry/Triangle.h>
 #include <Geometry/Geometry.h>
 #include <Geometry/PointLight.h>
+#include <Math/RandomDirection.h>
 
 namespace Geometry
 {
@@ -57,12 +58,6 @@ namespace Geometry
 		/// </summary>
 		/// <returns></returns>
 		virtual PointLight generate() = 0 {}
-
-		//Echantillonage a graine unique
-		void setSeed(int newSeed) {
-			randomGenerator.seed(newSeed);
-			std::cout << "seed set to : " << newSeed << std::endl;
-		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	const Math::Vector3 & PointLight::position() const
