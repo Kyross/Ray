@@ -42,23 +42,13 @@ namespace Geometry
 		// Hérité via SourceLight
 		PointLight generate()
 		{
-			//double xi1 = double(randomGenerator()) / double(randomGenerator.max());
-			//double xi2 = double(randomGenerator()) / double(randomGenerator.max());
-
 			double inf1 = m_computedIntervals[m_compteurStratif].first.first;
 			double sup1 = m_computedIntervals[m_compteurStratif].first.second;
 			double inf2 = m_computedIntervals[m_compteurStratif].second.first;
 			double sup2 = m_computedIntervals[m_compteurStratif].second.second;
-			/*
-			std::cout << "Inf1 : " << inf1 << " - ";
-			std::cout << "Sup1 : " << sup1 << " - ";
-			std::cout << "Inf2 : " << inf2 << " - ";
-			std::cout << "Sup2 : " << sup2 << std::endl;
-			*/
-			//Calcul d'un random entre inf et sup
-			double xi1 = fmod( double(randomGenerator()) / double(randomGenerator.max() ), double(sup1 - inf1)) + inf1;
-			double xi2 = fmod( double(randomGenerator()) / double(randomGenerator.max() ), double(sup2 - inf2)) + inf2;
-			//std::cout << xi1 << std::endl;
+
+			double xi1 = Math::RandomDirection::random(inf1, sup1);
+			double xi2 = Math::RandomDirection::random(inf2, sup2);
 
 			//xi1 = (inf1 + sup1) / 2.0;
 			//xi2 = (inf2 + sup2) / 2.0;
