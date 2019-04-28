@@ -161,7 +161,7 @@ void initDiffuse(Geometry::Scene & scene)
 
 		//Rectangle
 		Geometry::LightSource * surface4 = new Geometry::LightRectangle(Math::makeVector(0.0f, 0.0f, 4.0f), defaultRota, 1.0 ,1.0, ematerial1, 25);
-		//scene.add(surface4);
+		scene.add(surface4);
 	}
 	{
 		Geometry::Camera camera(Math::makeVector(-4.0f, 0.0f, 0.0f), Math::makeVector(0.0f, 0.0f, 0.0f), 0.3f, 1.0f, 1.0f);
