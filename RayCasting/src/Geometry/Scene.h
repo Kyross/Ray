@@ -161,6 +161,21 @@ namespace Geometry
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \fn	void Scene::add(Light & light)
+		///
+		/// \brief	Adds a light source in the scene.
+		///
+		/// \author	F. Lamarche, Universit� de Rennes 1
+		/// \date	04/12/2013
+		///
+		/// \param [in,out]	light	If non-null, the light to add.
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		void add(const PointLight & light) 
+		{
+			m_lights.push_back(light);
+		}
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	void Scene::add(LightSource * light)
 		///
 		/// \brief	Adds a light source in the scene.
@@ -218,7 +233,7 @@ namespace Geometry
 			}
 			
 			//verification intersection
-			optim(cray,"BVH", nullptr);
+			optim(cray,"BVH");
 
 
 			//Si intersection calcule selon le modele sinon background_color (noir) par defaut
@@ -331,10 +346,10 @@ namespace Geometry
 			return cray.intersectionFound().triangle()->material()->getSpecular()*sendRay(creflection, depth + 1, maxDepth, diffuseSamples, specularSamples)*krefl;
 		}
 
-		void optim(CastedRay &cray, char* s="", const Triangle * toIgnore = nullptr) {
+		void optim(CastedRay &cray, char* s="") {
 			if (s=="BVH") {
 				//BVH
-				m_bvh->path(cray, toIgnore);
+				m_bvh->path(cray);
 			}
 			else {
 				optimTemp(cray);

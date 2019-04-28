@@ -123,24 +123,24 @@ void initDiffuse(Geometry::Scene & scene)
 	geo.scaleZ(10) ;
 	scene.add(geo) ;
 
-	Geometry::Cube tmp(blueMat) ;
-	tmp.translate(Math::makeVector(1.0f, 3.0f, -4.0f));
-	//tmp.translate(Math::makeVector(1.5,-1.5,0.0)) ;
+	Geometry::Cube tmp(redMat) ;
+	//tmp.translate(Math::makeVector(1.0f, 3.0f, -4.0f)); //Gatien
+	tmp.translate(Math::makeVector(1.5,-1.5,0.0)) ;
 	scene.add(tmp) ;
 	
-	Geometry::Cube tmp2(blueMat) ;
-	tmp2.translate(Math::makeVector(1.0f, -3.0f, -4.0f));
-	//tmp2.translate(Math::makeVector(2,1,-4)) ;
+	Geometry::Cube tmp2(redMat) ;
+	//tmp2.translate(Math::makeVector(1.0f, -3.0f, -4.0f)); //Gatien
+	tmp2.translate(Math::makeVector(2,1,-4)) ;
 	scene.add(tmp2) ;
 
 	// 2.2 Adds point lights in the scene 
 	{
 		Geometry::PointLight pointLight(Math::makeVector(0.0f, 0.f, 2.0f), RGBColor(0.5f, 0.5f, 0.5f));
-		//scene.add(pointLight);
+		scene.add(pointLight);
 	}
 	{
 		Geometry::PointLight pointLight2(Math::makeVector(4.f, 0.f, 0.f), RGBColor(0.5f, 0.5f, 0.5f));
-		//scene.add(pointLight2);
+		scene.add(pointLight2);
 	}
 	Geometry::Material * ematerial1 = new Geometry::Material(0, 0, 0, 0, { 1,1,1 });
 	Geometry::Material * ematerial2 = new Geometry::Material(0, 0, 0, 0, { 0.1, 1, 1 });
@@ -148,12 +148,12 @@ void initDiffuse(Geometry::Scene & scene)
 	Math::Quaternion<double> q(Math::makeVector(-1.0,1.0,0.0),1.0);
 	{
 		//Rectangle du prof
-		Geometry::LightSource * surface1 = new Geometry::LightSurface(Math::makeVector(1.0f, 3.0f, 4.5f), q, 1.0,1.0, ematerial1, 25);
-		//scene.add(surface1);
+		Geometry::LightSource * surface1 = new Geometry::LightSurface(Math::makeVector(0.0f, 0.0f, 4.5f), defaultRota, 2.0,1.0, ematerial1, 25);
+		scene.add(surface1);
 
 		//Disk
 		Geometry::LightSource * surface2 = new Geometry::LightDisk(Math::makeVector(1.0f, -3.0f, 2.50f), q, 1.5f, 50, ematerial1, 25);
-		scene.add(surface2);
+		//scene.add(surface2);
 
 		//Sphere
 		Geometry::LightSource * surface3 = new Geometry::LightSphere(Math::makeVector(1.0f, 3.0f, 4.50f), 1.0f, 50, ematerial1, 25);
@@ -167,14 +167,6 @@ void initDiffuse(Geometry::Scene & scene)
 		Geometry::Camera camera(Math::makeVector(-4.0f, 0.0f, 0.0f), Math::makeVector(0.0f, 0.0f, 0.0f), 0.3f, 1.0f, 1.0f);
 		scene.setCamera(camera);
 	}
-	//createSurfaceLigth(scene, 5);
-	/*
-	Geometry::Material * emissiveMat = new Geometry::Material(0, 0, 0, 0, { 1,1,1 });
-	Geometry::Square square(emissiveMat);
-	square.scale(2);
-	square.translate(Math::makeVector(0, 0, 4));
-	scene.add(square);
-	*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
