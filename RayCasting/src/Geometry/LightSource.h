@@ -46,6 +46,7 @@ namespace Geometry
 
 					std::pair< std::pair<double, double>, std::pair<double, double> > currentInterval(interval1, interval2);
 					m_computedIntervals.push_back(currentInterval);
+					
 				}
 			}	
 		}
@@ -57,7 +58,11 @@ namespace Geometry
 		/// <returns></returns>
 		virtual PointLight generate() = 0 {}
 
-		
+		//Echantillonage a graine unique
+		void setSeed(int newSeed) {
+			randomGenerator.seed(newSeed);
+			std::cout << "seed set to : " << newSeed << std::endl;
+		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	const Math::Vector3 & PointLight::position() const

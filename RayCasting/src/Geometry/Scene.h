@@ -17,6 +17,7 @@
 #include <Geometry/LightSampler.h>
 #include <Geometry/BVH.h>
 #include <Geometry/LightSource.h>
+#include <ctime>
 
 namespace Geometry
 {
@@ -65,9 +66,19 @@ namespace Geometry
 		bool m_GI_surface = true;
 		//Activer ou desactiver la stratification
 		bool m_stratif = true;
+		//Activer ou desactiver l'echantillonnage a graine unique
+		bool m_graineUnique = true;
 
 
 	public:
+
+		////Echantillonage a graine unique
+		void setSeeds(int newSeed) {
+			for (LightSource * source : m_lightSampler) {
+				source->setSeed(newSeed);
+			}
+		}
+
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	Scene::Scene(Visualizer::Visualizer * visu)
@@ -444,6 +455,9 @@ namespace Geometry
 				{
 					for (double yp = -0.5; yp < 0.5; yp += step)
 					{
+						if (m_graineUnique) {
+							setSeeds(time(0));
+						}
 						::std::cout << "Pass: " << m_pass << "/" << passPerPixel * subPixelDivision * subPixelDivision << ::std::endl;
 						++m_pass;
 						// Sends primary rays for each pixel (uncomment the pragma to parallelize rendering)
