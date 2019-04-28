@@ -71,24 +71,22 @@ namespace Geometry {
 			delete m_root;
 		}
 
-		void path(CastedRay &cray, const Triangle * & toIgnore) {
+		void path(CastedRay &cray) {
 			double t0 = 0.0;
 			double t1 = 100000.0;
 			double entry, exit;
 			//box de la scene intersecte par le rayon
 			if (m_root->m_boundingVolume.intersect(cray, t0, t1, entry, exit)) {
 				//on parcours recusirvement les box jusqu'a buff sur le triangle le plus proche
-					checkNode(m_root, cray, entry, exit, toIgnore);	
+					checkNode(m_root, cray, entry, exit);	
 			}
 		}
 
 	protected:
-		void checkNode(BVHNode *current, CastedRay &cray, double t0, double t1, const Triangle * & toIgnore) {
+		void checkNode(BVHNode *current, CastedRay &cray, double t0, double t1) {
 			double  l_entry, l_exit, r_entry, r_exit;
 			if (current->isLeaf()) {
 				for (const Triangle * t : current->m_primitives) {
-					//Bug des ombres
-					//if(t != toIgnore) 
 						cray.intersect(t);
 				}
 			}
@@ -98,36 +96,36 @@ namespace Geometry {
 
 				if (!isIntersectFilsGauche && !isIntersectFilsDroit) {}
 				else if (isIntersectFilsGauche && !isIntersectFilsDroit)
-					checkNode(current->m_filsGauche, cray, l_entry, l_exit, toIgnore);
+					checkNode(current->m_filsGauche, cray, l_entry, l_exit);
 				else if (isIntersectFilsDroit && !isIntersectFilsGauche)
-					checkNode(current->m_filsDroit, cray, r_entry, r_exit, toIgnore);
+					checkNode(current->m_filsDroit, cray, r_entry, r_exit);
 				else if (l_entry < r_entry)
 				{
-					checkNode(current->m_filsGauche, cray, l_entry, l_exit, toIgnore);
+					checkNode(current->m_filsGauche, cray, l_entry, l_exit);
 
 					if (!cray.validIntersectionFound())
 					{
-						checkNode(current->m_filsDroit, cray, r_entry, r_exit, toIgnore);
+						checkNode(current->m_filsDroit, cray, r_entry, r_exit);
 					}
 					else {
 						Math::Vector3f ti = cray.intersectionFound().intersection() - cray.source();
 						if (ti.norm() > r_entry) {
-							checkNode(current->m_filsDroit, cray, r_entry, ti.norm(), toIgnore);
+							checkNode(current->m_filsDroit, cray, r_entry, ti.norm());
 						}
 					}
 				}
 				else
 				{
-					checkNode(current->m_filsDroit, cray, r_entry, r_exit, toIgnore);
+					checkNode(current->m_filsDroit, cray, r_entry, r_exit);
 
 					if (!cray.validIntersectionFound())
 					{
-						checkNode(current->m_filsGauche, cray, l_entry, l_exit, toIgnore);
+						checkNode(current->m_filsGauche, cray, l_entry, l_exit);
 					}
 					else {
 						Math::Vector3f ti = cray.intersectionFound().intersection() - cray.source();
 						if (ti.norm() > l_entry) {
-							checkNode(current->m_filsGauche, cray, l_entry, ti.norm(), toIgnore);
+							checkNode(current->m_filsGauche, cray, l_entry, ti.norm());
 						}
 					}
 				}
