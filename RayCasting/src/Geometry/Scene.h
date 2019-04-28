@@ -63,10 +63,13 @@ namespace Geometry
 		::std::vector<LightSource*> m_lightSampler;
 		//La structure d'optimisation qui va permettre d'optimiser le calcul d'intersections
 		BVH *m_bvh;
+		//******GI
 		//Activer ou desactiver l'illumination globale
 		bool m_GI_surface = true;
 		//Activer ou desactiver l'echantillonnage a graine unique
-		bool m_graineUnique = true;
+		bool m_GI_graineUnique = false;
+		//pathtracing
+		bool m_GI_indirect = true;
 
 
 	public:
@@ -189,7 +192,7 @@ namespace Geometry
 		void add(LightSource *light)
 		{
 			m_lightSampler.push_back(light);
-			//add(*light);			
+			add(*light);			
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -243,7 +246,7 @@ namespace Geometry
 				RGBColor ia = cray.intersectionFound().triangle()->material()->getAmbient();
 
 				//On ne prend pas en compte ia dans les calculs car elle fausse le r�sultat pour (au moins) sombrero et robot
-				I = ie + phongDirect(cray) +reflection(cray, depth, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
+				I = ie + phongDirect(cray) + reflection(cray, depth + 1, maxDepth, diffuseSamples, specularSamples, krefl);//+ sendRay(r_refraction, depth + 1, maxDepth, diffuseSamples, specularSamples) * krefr;
 				//texture
 				RGBColor stexture = cray.intersectionFound().triangle()->sampleTexture(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue());
 				I = I * stexture;
@@ -252,8 +255,8 @@ namespace Geometry
 		}
 
 
-
-		RGBColor pathTracing(Ray const & ray)
+		
+		RGBColor pathTracing(Ray const & ray,int depth,int maxDepth, int diffuseSamples, int specularSamples)
 		{
 			//step 0 : init
 			CastedRay cray = CastedRay(ray);
@@ -265,19 +268,29 @@ namespace Geometry
 				double p = ((double)rand() / (RAND_MAX));
 				double absorption = 1 - p;
 				RGBColor Le = cray.intersectionFound().triangle()->material()->getEmissive();
+				RGBColor stexture = cray.intersectionFound().triangle()->sampleTexture(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue());
 
 				if (p < absorption) {
 					//step 3 - recurssion : Generate a new ray in random direction from intersection
 					const Math::Vector3f N = cray.intersectionFound().triangle()->sampleNormal(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue(), cray.source()); //surface normal
 					const Math::Vector3f source = cray.intersectionFound().intersection();																																											
 					Math::RandomDirection rdirection = Math::RandomDirection(N.normalized());
-					CastedRay randomRay = CastedRay(source, rdirection.generate());
 
-					return Le+ phongDirect(cray)+pathTracing(randomRay)*absorption;
+					//send multiple ray to reduce noise --> crash
+					int nbRay = 1;
+					RGBColor rayColorSum(0.0, 0.0, 0.0);
+					for (int i = 0; i < nbRay; i++)
+					{
+						CastedRay randomRay = CastedRay(source, rdirection.generate());
+						RGBColor rayColor = pathTracing(randomRay, depth, maxDepth, diffuseSamples, specularSamples)*absorption;
+						rayColorSum = rayColorSum + rayColor / nbRay;
+					}
+
+					return Le + phongDirect(cray)*stexture+rayColorSum;
 				}
 				else {
 					//step 3 - stop recuression 
-					return Le;
+					return Le + phongDirect(cray)*stexture;
 				}
 			}
 			else {
@@ -475,10 +488,16 @@ namespace Geometry
 #pragma omp critical (visu)
 								m_visu->plot(x, y, RGBColor(1000.0, 0.0, 0.0));
 								//Echantillonnage
-								if (m_graineUnique) std::srand(newSeed);
+								if (m_GI_graineUnique) std::srand(newSeed);
 								// Ray casting
-								//RGBColor result = sendRay(m_camera.getRay(((double)x + xp) / m_visu->width(), ((double)y + yp) / m_visu->height()), 0, maxDepth, m_diffuseSamples, m_specularSamples);
-								RGBColor result = pathTracing(m_camera.getRay(((double)x + xp) / m_visu->width(), ((double)y + yp) / m_visu->height()));
+								RGBColor result;
+								if (m_GI_indirect) {
+									result = pathTracing(m_camera.getRay(((double)x + xp) / m_visu->width(), ((double)y + yp) / m_visu->height()), 0, maxDepth, m_diffuseSamples, m_specularSamples);
+								}
+								else {
+									result = sendRay(m_camera.getRay(((double)x + xp) / m_visu->width(), ((double)y + yp) / m_visu->height()), 0, maxDepth, m_diffuseSamples, m_specularSamples);
+								}
+								
 								// Accumulation of ray casting result in the associated pixel
 								::std::pair<int, RGBColor> & currentPixel = pixelTable[x][y];
 								currentPixel.first++;
