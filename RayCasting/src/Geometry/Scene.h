@@ -18,6 +18,7 @@
 #include <Geometry/BVH.h>
 #include <Geometry/LightSource.h>
 #include <ctime>
+#include <Math/RandomDirection.h>
 
 namespace Geometry
 {
@@ -188,7 +189,7 @@ namespace Geometry
 		void add(LightSource *light)
 		{
 			m_lightSampler.push_back(light);
-			add(*light);			
+			//add(*light);			
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -250,7 +251,40 @@ namespace Geometry
 			return I;
 		}
 
-		//RGBColor phongDirect(CastedRay const &cray, PointLight generated_light, const Triangle * toIgnore) {
+
+
+		RGBColor pathTracing(Ray const & ray)
+		{
+			//step 0 : init
+			CastedRay cray = CastedRay(ray);
+			optim(cray, "BVH");
+			
+			//step 1 : intersection find
+			if (cray.validIntersectionFound()) {
+				//Generate uniform random p to bounce the ray or not - russian roulette
+				double p = ((double)rand() / (RAND_MAX));
+				double absorption = 1 - p;
+				RGBColor Le = cray.intersectionFound().triangle()->material()->getEmissive();
+
+				if (p < absorption) {
+					//step 3 - recurssion : Generate a new ray in random direction from intersection
+					const Math::Vector3f N = cray.intersectionFound().triangle()->sampleNormal(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue(), cray.source()); //surface normal
+					const Math::Vector3f source = cray.intersectionFound().intersection();																																											
+					Math::RandomDirection rdirection = Math::RandomDirection(N.normalized());
+					CastedRay randomRay = CastedRay(source, rdirection.generate());
+
+					return Le+ phongDirect(cray)+pathTracing(randomRay)*absorption;
+				}
+				else {
+					//step 3 - stop recuression 
+					return Le;
+				}
+			}
+			else {
+				return RGBColor(0.0, 0.0, 0.0); //background color
+			}
+		}
+
 		RGBColor phongDirect(CastedRay const &cray) {
 			RGBColor result(0.0, 0.0, 0.0);
 			
@@ -443,8 +477,8 @@ namespace Geometry
 								//Echantillonnage
 								if (m_graineUnique) std::srand(newSeed);
 								// Ray casting
-								RGBColor result = sendRay(m_camera.getRay(((double)x + xp) / m_visu->width(), ((double)y + yp) / m_visu->height()), 0, maxDepth, m_diffuseSamples, m_specularSamples);
-								
+								//RGBColor result = sendRay(m_camera.getRay(((double)x + xp) / m_visu->width(), ((double)y + yp) / m_visu->height()), 0, maxDepth, m_diffuseSamples, m_specularSamples);
+								RGBColor result = pathTracing(m_camera.getRay(((double)x + xp) / m_visu->width(), ((double)y + yp) / m_visu->height()));
 								// Accumulation of ray casting result in the associated pixel
 								::std::pair<int, RGBColor> & currentPixel = pixelTable[x][y];
 								currentPixel.first++;
