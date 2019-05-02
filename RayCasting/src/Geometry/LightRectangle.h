@@ -24,8 +24,9 @@ namespace Geometry
 			
 			this->scaleX(width);
 			this->scaleY(height);
-			this->translate(m_position);
 			this->rotate(q);
+			this->translate(m_position);
+			
 
 			auto & triangles = getTriangles();
 			add(triangles.begin(), triangles.end());

@@ -32,8 +32,9 @@ namespace Geometry
 			{
 				addTriangle(center, vertices[cpt], vertices[(cpt + 1) % nbDiv], ematerial);
 			}
-			this->translate(m_position);
 			this->rotate(q);
+			this->translate(m_position);
+			
 
 			auto & triangles = getTriangles();
 			add(triangles.begin(), triangles.end());
