@@ -115,6 +115,7 @@ void initDiffuse(Geometry::Scene & scene)
 	Geometry::Material * redMat = new Geometry::Material(RGBColor(), RGBColor(1.0, 0.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
 	Geometry::Material * greenMat = new Geometry::Material(RGBColor(), RGBColor(0.0, 1.0, 0.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
 	Geometry::Material * blueMat = new Geometry::Material(RGBColor(), RGBColor(0.0, 0.0, 1.0), RGBColor(0.0, 0.0, 0.0), 20.0f, RGBColor());
+	Geometry::Material * whiteMat = new Geometry::Material(RGBColor(), RGBColor(0.0, 1.0, 1.0), RGBColor(0.0, 0.0, 0.0), 0.0f, RGBColor());
 
 	Geometry::Cornel geo(material2, material2, material2, blueMat, redMat, greenMat) ;
 
@@ -128,7 +129,10 @@ void initDiffuse(Geometry::Scene & scene)
 	tmp.translate(Math::makeVector(1.5,-1.5,0.0)) ;
 	scene.add(tmp) ;
 	
-	Geometry::Cube tmp2(redMat) ;
+	Geometry::Cube tmp2(whiteMat) ;
+	Math::Quaternion<double> cubeRota(Math::makeVector(-1.0, 1.0, 0.0), 1.0);
+	tmp2.rotate(cubeRota);
+	tmp2.scale(3);
 	//tmp2.translate(Math::makeVector(1.0f, -3.0f, -4.0f)); //Gatien
 	tmp2.translate(Math::makeVector(2,1,-4)) ;
 	scene.add(tmp2) ;
@@ -146,17 +150,18 @@ void initDiffuse(Geometry::Scene & scene)
 	Geometry::Material * ematerial2 = new Geometry::Material(0, 0, 0, 0, { 0.1, 1, 1 });
 	Math::Quaternion<double> defaultRota(Math::makeVector(0.0, 0.0, 0.0), 0.0);
 	Math::Quaternion<double> q(Math::makeVector(-1.0,1.0,0.0),1.0);
+	Math::Quaternion<double> q2(Math::makeVector(0.0, 1.0, 0.0), 3.14);
 	{
 		//Rectangle du prof
 		Geometry::LightSource * surface1 = new Geometry::LightSurface(Math::makeVector(0.0f, 0.0f, 4.5f), defaultRota, 2.0,1.0, ematerial1, 25);
-		scene.add(surface1);
+		//scene.add(surface1);
 
 		//Disk
-		Geometry::LightSource * surface2 = new Geometry::LightDisk(Math::makeVector(1.0f, -3.0f, 2.50f), q, 1.5f, 50, ematerial1, 25);
-		//scene.add(surface2);
+		Geometry::LightSource * surface2 = new Geometry::LightDisk(Math::makeVector(0.0f, 0.0f, 4.5f), defaultRota, 1.5f, 50, ematerial1, 64);
+		scene.add(surface2);
 
 		//Sphere
-		Geometry::LightSource * surface3 = new Geometry::LightSphere(Math::makeVector(1.0f, 3.0f, 4.50f), 1.0f, 50, ematerial1, 25);
+		Geometry::LightSource * surface3 = new Geometry::LightSphere(Math::makeVector(1.0f, 3.0f, 4.50f), 1.0f, 50, ematerial1, 400);
 		//scene.add(surface3);
 
 		//Rectangle
@@ -308,7 +313,8 @@ void initGuitar(Geometry::Scene & scene)
 	// 2.2 Adds point lights in the scene 
 	Geometry::BoundingBox sb = scene.getBoundingBox();
 	Math::Vector3f position = sb.max();
-	Geometry::PointLight light1(position + Math::makeVector(0.f, 0.f, 70.f/*100.f*/), RGBColor(1.0, 1.0, 1.0)*500);
+	//Geometry::PointLight light1(position + Math::makeVector(0.f, 0.f, 70.f/*100.f*/), RGBColor(1.0, 1.0, 1.0)*500);
+	Geometry::PointLight light1(position + Math::makeVector(1800.0f, -500.0f, 1000.0f), RGBColor(0.5, 1.0, 1.0) * 500);
 	//scene.add(light1);
 	position[1] = -position[1];
 	Geometry::PointLight light2(position+Math::makeVector(0.f,0.f,200.f), RGBColor(1.0, 1.0, 1.0)*500);
@@ -319,6 +325,10 @@ void initGuitar(Geometry::Scene & scene)
 		scene.setCamera(camera);
 	}
 	createGround(scene);
+	Geometry::Material * ematerial1 = new Geometry::Material(0, 0, 0, 0, { 500,1000,1000 });
+	Math::Quaternion<double> defaultRota(Math::makeVector(0.0, 0.0, 0.0), 0.0);
+	Geometry::LightSource * surface2 = new Geometry::LightDisk(Math::makeVector(1800.0f, -500.0f, 1000.0f), defaultRota, 100.0f, 50, ematerial1, 64);
+	scene.add(surface2);
 }
 
 /// <summary>
@@ -382,8 +392,12 @@ void initTemple(Geometry::Scene & scene)
 		scene.setCamera(camera);
 	}
 	createGround(scene);
-	createSurfaceLigth(scene, 50);
+	//createSurfaceLigth(scene, 50);
 	//createSurfaceLigth(scene, 500);
+	Geometry::Material * ematerial1 = new Geometry::Material(0, 0, 0, 0, { 1000,1000,1000 });
+	Math::Quaternion<double> defaultRota(Math::makeVector(0.0, 0.0, 0.0), 0.0);
+	Geometry::LightSource * surface2 = new Geometry::LightDisk(Math::makeVector(1800.0f, -500.0f, 1000.0f), defaultRota, 100.0f, 50, ematerial1, 64);
+	scene.add(surface2);
 }
 
 /// <summary>
@@ -484,17 +498,21 @@ void initBoat(Geometry::Scene & scene)
 	Geometry::BoundingBox sb = scene.getBoundingBox();
 	Math::Vector3f position = sb.max();
 	Geometry::PointLight light1(position, RGBColor(1.0, 1.0, 1.0)*6000.0);
-	//scene.add(light1);
+	scene.add(light1);
 	position[1] = -position[1];
 	Geometry::PointLight light2(position, RGBColor(1.0, 1.0, 1.0) * 20000);
-	//scene.add(light2);
+	scene.add(light2);
 	{
 		Geometry::Camera camera(Math::makeVector(5000.f, 5000.f, 200.0f), Math::makeVector(0.f, 0.f, 60.f), 0.3f, 1.0f, 1.0f);
 		camera.translateLocal(Math::makeVector(2000.f, 3000.f, 700.f));
 		scene.setCamera(camera);
 	}
 	createGround(scene);
-	createSurfaceLigth(scene, 4000);
+	//createSurfaceLigth(scene, 4000);
+	Geometry::Material * ematerial1 = new Geometry::Material(0, 0, 0, 0, { 3000,3000,3000 });
+	Math::Quaternion<double> defaultRota(Math::makeVector(0.0, 0.0, 0.0), 0.0);
+	Geometry::LightSource * surface2 = new Geometry::LightDisk(sb.max(), defaultRota, 100.0f, 50, ematerial1, 64);
+	//scene.add(surface2);
 }
 
 /// <summary>
@@ -533,6 +551,14 @@ void initTibetHouse(Geometry::Scene & scene)
 	//scene.add(light2);
 	//Geometry::PointLight light3(Math::makeVector(5.f, 35.f, 5.f), RGBColor(1.0, 1.0, 1.0) * 200); //*50
 	//scene.add(light3);
+
+	Geometry::Material * ematerial1 = new Geometry::Material(0, 0, 0, 0, { 1,1,1 });
+	Geometry::Material * ematerial2 = new Geometry::Material(0, 0, 0, 0, { 0.1, 1, 1 });
+
+	//Sphere
+	Geometry::LightSource * surface3 = new Geometry::LightSphere(Math::makeVector(00.0f, 30.0f, 40.0f), 1.0f, 50, ematerial1, 100);
+	scene.add(surface3);
+
 	{
 		Geometry::Camera camera(Math::makeVector(20.f, 0.f, 0.0f), Math::makeVector(5.f, 35.f, 0.f), 0.3f, 1.0f, 1.0f);
 		camera.translateLocal(Math::makeVector(0.f, 5.f, 0.f)/*+Math::makeVector(0.0,5.0,0.0)*/);
@@ -575,7 +601,7 @@ void initTibetHouseInside(Geometry::Scene & scene)
 	position[1] = -position[1];
 	Geometry::PointLight light2(position, RGBColor(1.0, 1.0, 1.0) * 200);
 	//scene.add(light2);
-	Geometry::PointLight light3(Math::makeVector(5.f, 35.f, 5.f), RGBColor(1.0, 1.0, 1.0) * 50);
+	Geometry::PointLight light3(Math::makeVector(5.f, 35.f, 5.f), RGBColor(1.0, 1.0, 1.0) * 5);
 	//scene.add(light3);
 	{
 		Geometry::Camera camera(Math::makeVector(20.f, 0.f, 5.0f), Math::makeVector(5.f, 35.f, 5.f), 0.3f, 1.0f, 1.0f);
@@ -583,6 +609,10 @@ void initTibetHouseInside(Geometry::Scene & scene)
 		scene.setCamera(camera);
 	}
 	createGround(scene);
+	Geometry::Material * ematerial1 = new Geometry::Material(0, 0, 0, 0, { 1,1,1 });
+	Math::Quaternion<double> defaultRota(Math::makeVector(0.0, 0.0, 0.0), 0.0);
+	Geometry::LightSource * surface2 = new Geometry::LightDisk(Math::makeVector(5.f, 35.f, 5.f), defaultRota, 1.0f, 50, ematerial1, 64);
+	scene.add(surface2);
 }
 
 /// <summary>
@@ -735,9 +765,9 @@ int main(int argc, char ** argv)
 	scene.printStats();
 
 	// 3 - Computes the scene
-	unsigned int passPerPixel = 64 / 8;	// Number of rays per pixel 
+	unsigned int passPerPixel = 1000 / 16;	// Number of rays per pixel 
 	unsigned int subPixelSampling = 4;	// Antialiasing
-	unsigned int maxBounce = 5;
+	unsigned int maxBounce = 20;
 	//unsigned int maxBounce = 2;			// Maximum number of bounces
 
 	//scene.setDiffuseSamples(16);
