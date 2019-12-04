@@ -129,10 +129,10 @@ void initDiffuse(Geometry::Scene & scene)
 	tmp.translate(Math::makeVector(1.5,-1.5,0.0)) ;
 	scene.add(tmp) ;
 	
-	Geometry::Cube tmp2(whiteMat) ;
+	Geometry::Cube tmp2(redMat) ;
 	Math::Quaternion<double> cubeRota(Math::makeVector(-1.0, 1.0, 0.0), 1.0);
-	tmp2.rotate(cubeRota);
-	tmp2.scale(3);
+	//tmp2.rotate(cubeRota);
+	//tmp2.scale(3);
 	//tmp2.translate(Math::makeVector(1.0f, -3.0f, -4.0f)); //Gatien
 	tmp2.translate(Math::makeVector(2,1,-4)) ;
 	scene.add(tmp2) ;
@@ -153,12 +153,12 @@ void initDiffuse(Geometry::Scene & scene)
 	Math::Quaternion<double> q2(Math::makeVector(0.0, 1.0, 0.0), 3.14);
 	{
 		//Rectangle du prof
-		Geometry::LightSource * surface1 = new Geometry::LightSurface(Math::makeVector(0.0f, 0.0f, 4.5f), defaultRota, 2.0,1.0, ematerial1, 25);
-		//scene.add(surface1);
+		Geometry::LightSource * surface1 = new Geometry::LightSurface(Math::makeVector(0.0f, 0.0f, 4.9f), defaultRota, 2.0,1.0, ematerial1, 25);
+		scene.add(surface1);
 
 		//Disk
 		Geometry::LightSource * surface2 = new Geometry::LightDisk(Math::makeVector(0.0f, 0.0f, 4.5f), defaultRota, 1.5f, 50, ematerial1, 64);
-		scene.add(surface2);
+		//scene.add(surface2);
 
 		//Sphere
 		Geometry::LightSource * surface3 = new Geometry::LightSphere(Math::makeVector(1.0f, 3.0f, 4.50f), 1.0f, 50, ematerial1, 400);

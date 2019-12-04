@@ -67,7 +67,7 @@ namespace Geometry
 		//Activer ou desactiver l'illumination globale
 		bool m_GI_surface = true;
 		//Activer ou desactiver l'echantillonnage a graine unique
-		bool m_GI_graineUnique = false;
+		bool m_GI_graineUnique = false; // NE PAS TOUCHE MAMA
 		//pathtracing
 		bool m_GI_indirect = true;
 
@@ -273,11 +273,8 @@ namespace Geometry
 				if (p < absorption) {
 					//step 3 - recurssion : Generate a new ray in random direction from intersection
 					const Math::Vector3f N = cray.intersectionFound().triangle()->sampleNormal(cray.intersectionFound().uTriangleValue(), cray.intersectionFound().vTriangleValue(), cray.source()); //surface normal
-					const Math::Vector3f source = cray.intersectionFound().intersection();	
-					//std::srand(1);
-					//Math::RandomDirection rdirection = Math::RandomDirection(N.normalized());
-					Math::RandomDirection rdirection = Math::RandomDirection(cray.intersectionFound().triangle()->reflectionDirection(N, cray.direction()), cray.intersectionFound().triangle()->material()->getShininess());
-
+					const Math::Vector3f source = cray.intersectionFound().intersection();																																											
+					Math::RandomDirection rdirection = Math::RandomDirection(N.normalized());
 
 					//send multiple ray to reduce noise --> crash
 					int nbRay = 1;
@@ -285,8 +282,8 @@ namespace Geometry
 					for (int i = 0; i < nbRay; i++)
 					{
 						CastedRay randomRay = CastedRay(source, rdirection.generate());
-						// augmebnter depth
-						RGBColor rayColor = pathTracing(randomRay, depth+1, maxDepth, diffuseSamples, specularSamples)*absorption;
+						RGBColor rayColor = pathTracing(randomRay, depth, maxDepth, diffuseSamples, specularSamples) *absorption;
+						
 						rayColorSum = rayColorSum + rayColor / nbRay;
 					}
 
@@ -479,7 +476,7 @@ namespace Geometry
 				{
 					for (double yp = -0.5; yp < 0.5; yp += step)
 					{
-						int newSeed =time(0);
+						int newSeed = std::rand();
 
 						::std::cout << "Pass: " << m_pass << "/" << passPerPixel * subPixelDivision * subPixelDivision << ::std::endl;
 						++m_pass;
